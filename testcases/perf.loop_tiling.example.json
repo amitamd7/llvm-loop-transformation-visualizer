@@ -1,0 +1,38 @@
+{
+  "_comment": "Copy to web/perf.json. compare.function must match the selected function in the viewer (tile_demo for loop_tiling_*.ll).",
+  "compare": {
+    "function": "tile_demo",
+    "before": {
+      "cycles": 3200000000,
+      "instructions": 9000000000,
+      "cache_misses": 18000000,
+      "branch_misses": 520000
+    },
+    "after": {
+      "cycles": 2600000000,
+      "instructions": 7800000000,
+      "cache_misses": 12500000,
+      "branch_misses": 480000
+    }
+  },
+  "by_loop_id": {
+    "tile_demo::loop::0": {
+      "cycles": 3200000000,
+      "instructions": 9000000000,
+      "cache_misses": 18000000,
+      "branch_misses": 520000
+    },
+    "tile_demo::outer::0": {
+      "cycles": 3100000000,
+      "instructions": 7500000000,
+      "cache_misses": 9000000,
+      "branch_misses": 260000
+    },
+    "tile_demo::inner::1": {
+      "cycles": 2900000000,
+      "instructions": 7200000000,
+      "cache_misses": 3500000,
+      "branch_misses": 240000
+    }
+  }
+}
