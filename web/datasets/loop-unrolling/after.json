@@ -1,0 +1,62 @@
+{
+  "transform": "Loop Unrolling",
+  "source_file": "sum_array.c",
+  "functions": [
+    {
+      "name": "sum_array",
+      "instruction_count": 22,
+      "cfg": {
+        "nodes": [
+          { "id": "b0", "label": "entry", "instructions": { "total": 3, "arith": 1, "memory": 0, "branch": 1, "other": 1 } },
+          { "id": "b1", "label": "loop.header", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b2", "label": "loop.body.unrolled", "instructions": { "total": 12, "arith": 5, "memory": 4, "branch": 1, "other": 2 } },
+          { "id": "b3", "label": "loop.epilog.header", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b4", "label": "loop.epilog.body", "instructions": { "total": 3, "arith": 1, "memory": 1, "branch": 1, "other": 0 } },
+          { "id": "b5", "label": "exit", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 0, "other": 2 } }
+        ],
+        "edges": [
+          { "from": "b0", "to": "b1" },
+          { "from": "b1", "to": "b2" },
+          { "from": "b1", "to": "b3" },
+          { "from": "b2", "to": "b1" },
+          { "from": "b3", "to": "b4" },
+          { "from": "b3", "to": "b5" },
+          { "from": "b4", "to": "b3" }
+        ]
+      },
+      "loops": [
+        {
+          "id": "sum_array::loop.unrolled::0",
+          "header": "loop.header",
+          "depth": 1,
+          "blocks": ["loop.header", "loop.body.unrolled"],
+          "induction_variable": "i",
+          "trip_count": "((1 + (zext i32 (0 smax %N) to i33)) /u 4)<nuw>",
+          "memory_accesses": [
+            { "array": "A", "pattern": "stride-1", "type": "load" },
+            { "array": "A", "pattern": "stride-1", "type": "load" },
+            { "array": "A", "pattern": "stride-1", "type": "load" },
+            { "array": "A", "pattern": "stride-1", "type": "load" }
+          ],
+          "dependencies": [
+            { "type": "loop-carried", "from_var": "sum", "to_var": "sum", "distance": 1, "description": "Reduction on sum: 4 partial sums accumulated per iteration, then combined" }
+          ]
+        },
+        {
+          "id": "sum_array::loop.epilog::0",
+          "header": "loop.epilog.header",
+          "depth": 1,
+          "blocks": ["loop.epilog.header", "loop.epilog.body"],
+          "induction_variable": "i.epilog",
+          "trip_count": "(%N mod 4)",
+          "memory_accesses": [
+            { "array": "A", "pattern": "stride-1", "type": "load" }
+          ],
+          "dependencies": [
+            { "type": "loop-carried", "from_var": "sum", "to_var": "sum", "distance": 1, "description": "Epilog handles remaining 0-3 iterations after unrolled main loop" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "before": {
+    "execution_time": 78,
+    "cycles": 2100000000,
+    "instructions": 7200000000,
+    "ipc": 3.43,
+    "l1_miss_rate": 3.8,
+    "llc_miss_rate": 1.2,
+    "branch_miss_rate": 1.5
+  },
+  "after": {
+    "execution_time": 45,
+    "cycles": 1200000000,
+    "instructions": 5400000000,
+    "ipc": 4.50,
+    "l1_miss_rate": 1.1,
+    "llc_miss_rate": 0.3,
+    "branch_miss_rate": 0.8
+  },
+  "transform_insights": {
+    "name": "Loop Fusion",
+    "description": "Merges two adjacent loops with identical trip counts and compatible dependencies into a single loop. Loop 1 scaled A[i] *= alpha; Loop 2 computed C[i] = A[i] + B[i]. After fusion, both operations happen in one iteration, so A[i] stays in a register between the scale and the add.",
+    "why_helped": [
+      { "metric": "l1_miss_rate", "before": 3.8, "after": 1.1, "unit": "%", "explanation": "Before fusion, loop2 re-loaded A[i] from memory after loop1 wrote it. With large arrays, A had been evicted from L1 between the two loops. After fusion, the scaled A[i] stays in a register — no reload needed." },
+      { "metric": "instructions", "before": 7200000000, "after": 5400000000, "unit": "", "explanation": "25% fewer instructions: eliminated one loop's worth of induction variable increment, compare, and branch. Also eliminated the redundant load of A[i] in what was loop2." },
+      { "metric": "execution_time", "before": 78, "after": 45, "unit": "ms", "explanation": "42% speedup from combined cache locality improvement and reduced loop overhead." },
+      { "metric": "ipc", "before": 3.43, "after": 4.50, "unit": "", "explanation": "More useful compute per cycle: the fused body has better instruction-level parallelism (scale and add can overlap in the pipeline) and fewer pipeline flushes from eliminated branches." }
+    ],
+    "why_hurt": [],
+    "trade_offs": [
+      "Register pressure: The fused body needs registers for A[i], B[i], C[i], alpha, and the intermediate scaled value simultaneously. On register-starved architectures this could cause spills.",
+      "Legality: Fusion is only legal when the two loops have identical trip counts and no negative-distance dependencies between them. LLVM checks that loop2's reads of A[i] only depend on loop1's write to the same iteration's A[i], not a different iteration.",
+      "Code complexity: The fused loop body is larger, which could inhibit further optimizations like vectorization if the body becomes too complex for the vectorizer's cost model."
+    ]
+  }
+}

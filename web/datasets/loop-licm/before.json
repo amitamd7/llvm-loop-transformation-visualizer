@@ -1,0 +1,167 @@
+{
+  "source_file": "licm_before.ll",
+  "functions": [
+    {
+      "name": "compute_weighted_sum",
+      "instruction_count": 18,
+      "cfg": {
+        "nodes": [
+          {
+            "id": "entry",
+            "label": "entry",
+            "instructions": {
+              "total": 4,
+              "arith": 0,
+              "memory": 2,
+              "branch": 1,
+              "other": 1
+            },
+            "ir": [
+              "alloca",
+              "alloca",
+              "store 0, %sum",
+              "br %loop.header"
+            ]
+          },
+          {
+            "id": "loop.header",
+            "label": "loop.header",
+            "instructions": {
+              "total": 4,
+              "arith": 1,
+              "memory": 0,
+              "branch": 1,
+              "other": 2
+            },
+            "ir": [
+              "%i = phi",
+              "%sum.phi = phi",
+              "%cmp = icmp slt %i, %n",
+              "br i1 %cmp, %loop.body, %exit"
+            ]
+          },
+          {
+            "id": "loop.body",
+            "label": "loop.body",
+            "instructions": {
+              "total": 9,
+              "arith": 4,
+              "memory": 3,
+              "branch": 1,
+              "other": 1
+            },
+            "ir": [
+              "%w = load %weight",
+              "%s = load %scale",
+              "%ws = mul %w, %s",
+              "%ptr = getelementptr %arr, %i",
+              "%val = load %ptr",
+              "%prod = mul %val, %ws",
+              "%sum.new = add %sum.phi, %prod",
+              "%i.next = add %i, 1",
+              "br %loop.header"
+            ]
+          },
+          {
+            "id": "exit",
+            "label": "exit",
+            "instructions": {
+              "total": 1,
+              "arith": 0,
+              "memory": 0,
+              "branch": 1,
+              "other": 0
+            },
+            "ir": [
+              "ret %sum.phi"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "entry",
+            "to": "loop.header"
+          },
+          {
+            "from": "loop.header",
+            "to": "loop.body"
+          },
+          {
+            "from": "loop.header",
+            "to": "exit"
+          },
+          {
+            "from": "loop.body",
+            "to": "loop.header"
+          }
+        ]
+      },
+      "loops": [
+        {
+          "id": "loop_0",
+          "header": "loop.header",
+          "depth": 1,
+          "blocks": [
+            "loop.header",
+            "loop.body"
+          ],
+          "trip_count": 1024,
+          "induction_variable": "i",
+          "memory_accesses": [
+            {
+              "array": "weight",
+              "type": "read",
+              "pattern": "invariant",
+              "stride": 0,
+              "count": 1
+            },
+            {
+              "array": "scale",
+              "type": "read",
+              "pattern": "invariant",
+              "stride": 0,
+              "count": 1
+            },
+            {
+              "array": "arr",
+              "type": "read",
+              "pattern": "stride-1",
+              "stride": 1,
+              "count": 1
+            }
+          ],
+          "dependencies": [
+            {
+              "type": "loop-carried",
+              "from_var": "sum",
+              "to_var": "sum",
+              "distance": 1,
+              "description": "Reduction on sum"
+            },
+            {
+              "type": "loop-invariant",
+              "from_var": "weight",
+              "to_var": "ws",
+              "distance": 0,
+              "description": "Load of weight is invariant \u2014 recomputed each iteration"
+            },
+            {
+              "type": "loop-invariant",
+              "from_var": "scale",
+              "to_var": "ws",
+              "distance": 0,
+              "description": "Load of scale is invariant \u2014 recomputed each iteration"
+            },
+            {
+              "type": "loop-invariant",
+              "from_var": "ws",
+              "to_var": "prod",
+              "distance": 0,
+              "description": "Multiplication weight*scale is invariant \u2014 recomputed each iteration"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

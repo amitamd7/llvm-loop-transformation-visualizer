@@ -1,0 +1,58 @@
+{
+  "transform": "Loop Interchange",
+  "source_file": "col_sum.c",
+  "functions": [
+    {
+      "name": "col_sum",
+      "instruction_count": 16,
+      "cfg": {
+        "nodes": [
+          { "id": "b0", "label": "entry", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 1, "other": 1 } },
+          { "id": "b1", "label": "outer.header", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b2", "label": "inner.header", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b3", "label": "inner.body", "instructions": { "total": 5, "arith": 2, "memory": 2, "branch": 1, "other": 0 } },
+          { "id": "b4", "label": "outer.latch", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b5", "label": "exit", "instructions": { "total": 1, "arith": 0, "memory": 0, "branch": 0, "other": 1 } }
+        ],
+        "edges": [
+          { "from": "b0", "to": "b1" },
+          { "from": "b1", "to": "b2" },
+          { "from": "b1", "to": "b5" },
+          { "from": "b2", "to": "b3" },
+          { "from": "b2", "to": "b4" },
+          { "from": "b3", "to": "b2" },
+          { "from": "b4", "to": "b1" }
+        ]
+      },
+      "loops": [
+        {
+          "id": "col_sum::outer::0",
+          "header": "outer.header",
+          "depth": 1,
+          "blocks": ["outer.header", "inner.header", "inner.body", "outer.latch"],
+          "induction_variable": "i",
+          "trip_count": "1024",
+          "memory_accesses": [],
+          "dependencies": []
+        },
+        {
+          "id": "col_sum::inner::0",
+          "header": "inner.header",
+          "depth": 2,
+          "blocks": ["inner.header", "inner.body"],
+          "induction_variable": "j",
+          "trip_count": "1024",
+          "memory_accesses": [
+            { "array": "M", "pattern": "stride-1", "type": "load" },
+            { "array": "sum", "pattern": "stride-1", "type": "load" },
+            { "array": "sum", "pattern": "stride-1", "type": "store" }
+          ],
+          "dependencies": [
+            { "type": "loop-carried", "from_var": "sum[j]", "to_var": "sum[j]", "distance": 1, "description": "Reduction on sum[j]: inner loop now walks columns sequentially, accumulating M[i][j]" },
+            { "type": "anti", "from_var": "sum[j]", "to_var": "sum[j]", "distance": 0, "description": "Read-after-write on sum[j] within same iteration (load then store)" }
+          ]
+        }
+      ]
+    }
+  ]
+}

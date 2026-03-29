@@ -1,0 +1,24 @@
+{
+  "before": {
+    "execution_time": 2.84,
+    "cycles": 9320000,
+    "instructions": 15365120,
+    "ipc": 1.65,
+    "l1_miss_rate": 3.2,
+    "llc_miss_rate": 0.8,
+    "branch_miss_rate": 0.12
+  },
+  "after": {
+    "execution_time": 1.91,
+    "cycles": 6270000,
+    "instructions": 12291072,
+    "ipc": 1.96,
+    "l1_miss_rate": 2.1,
+    "llc_miss_rate": 0.6,
+    "branch_miss_rate": 0.11
+  },
+  "transform_insights": {
+    "name": "LICM (Loop-Invariant Code Motion)",
+    "description": "Hoisted invariant loads (weight, scale) and their multiplication out of the loop into a preheader block."
+  }
+}

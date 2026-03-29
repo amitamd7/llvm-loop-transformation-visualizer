@@ -1,0 +1,108 @@
+{
+  "functions": [
+    {
+      "cfg": {
+        "edges": [
+          {
+            "from": "b0",
+            "to": "b1"
+          },
+          {
+            "from": "b1",
+            "to": "b3"
+          },
+          {
+            "from": "b1",
+            "to": "b2"
+          },
+          {
+            "from": "b2",
+            "to": "b1"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "b0",
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "entry"
+          },
+          {
+            "id": "b1",
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 3
+            },
+            "label": "loop"
+          },
+          {
+            "id": "b2",
+            "instructions": {
+              "arith": 2,
+              "branch": 1,
+              "memory": 3,
+              "other": 0,
+              "total": 6
+            },
+            "label": "body"
+          },
+          {
+            "id": "b3",
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "exit"
+          }
+        ]
+      },
+      "instruction_count": 11,
+      "loops": [
+        {
+          "blocks": [
+            "loop",
+            "body"
+          ],
+          "dependencies": [
+            {
+              "description": "Write-after-read (anti) dependence",
+              "distance": 0,
+              "from_var": "v",
+              "to_var": "p",
+              "type": "anti"
+            }
+          ],
+          "depth": 1,
+          "header": "loop",
+          "id": "tile_demo::loop::0",
+          "induction_variable": "i",
+          "memory_accesses": [
+            {
+              "array": "A",
+              "pattern": "stride-1",
+              "type": "load"
+            },
+            {
+              "array": "A",
+              "pattern": "stride-1",
+              "type": "store"
+            }
+          ],
+          "trip_count": "(1 + (zext i32 (0 smax %N) to i33))<nuw><nsw>"
+        }
+      ],
+      "name": "tile_demo"
+    }
+  ]
+}

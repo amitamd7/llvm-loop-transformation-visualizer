@@ -1,0 +1,60 @@
+{
+  "transform": "Loop Tiling",
+  "source_file": "tile_demo.c",
+  "functions": [
+    {
+      "cfg": {
+        "edges": [
+          { "from": "b0", "to": "b1" },
+          { "from": "b1", "to": "b7" },
+          { "from": "b1", "to": "b2" },
+          { "from": "b2", "to": "b3" },
+          { "from": "b3", "to": "b6" },
+          { "from": "b3", "to": "b4" },
+          { "from": "b4", "to": "b5" },
+          { "from": "b5", "to": "b3" },
+          { "from": "b6", "to": "b1" }
+        ],
+        "nodes": [
+          { "id": "b0", "label": "entry", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 1, "other": 1 } },
+          { "id": "b1", "label": "outer", "instructions": { "total": 4, "arith": 2, "memory": 0, "branch": 2, "other": 0 } },
+          { "id": "b2", "label": "inner_entry", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b3", "label": "inner", "instructions": { "total": 3, "arith": 1, "memory": 0, "branch": 2, "other": 0 } },
+          { "id": "b4", "label": "body", "instructions": { "total": 4, "arith": 1, "memory": 2, "branch": 1, "other": 0 } },
+          { "id": "b5", "label": "inner_step", "instructions": { "total": 2, "arith": 2, "memory": 0, "branch": 0, "other": 0 } },
+          { "id": "b6", "label": "outer_inc", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b7", "label": "exit", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 0, "other": 2 } }
+        ]
+      },
+      "instruction_count": 21,
+      "loops": [
+        {
+          "blocks": ["outer", "inner_entry", "inner", "body", "inner_step", "outer_inc"],
+          "depth": 1,
+          "header": "outer",
+          "id": "tile_demo::outer::0",
+          "induction_variable": "t",
+          "memory_accesses": [],
+          "trip_count": "unknown",
+          "dependencies": []
+        },
+        {
+          "blocks": ["inner", "body", "inner_step"],
+          "depth": 2,
+          "header": "inner",
+          "id": "tile_demo::inner::1",
+          "induction_variable": "i",
+          "memory_accesses": [
+            { "array": "A", "pattern": "stride-1", "type": "load" },
+            { "array": "A", "pattern": "stride-1", "type": "store" }
+          ],
+          "trip_count": "(1 + ((zext i32 ({0,+,-4}<%outer> + ({0,+,4}<%outer> smax {4,+,4}<%outer>)) to i33) umin (zext i32 ({0,+,-4}<%outer> + ({0,+,4}<%outer> smax %N)) to i33)))<nuw><nsw>",
+          "dependencies": [
+            { "type": "output", "from_var": "A[i]", "to_var": "A[i]", "distance": 0, "description": "Write-after-write on A[i] within tile" }
+          ]
+        }
+      ],
+      "name": "tile_demo"
+    }
+  ]
+}

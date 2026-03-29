@@ -1,0 +1,38 @@
+{
+  "before": {
+    "execution_time": 120,
+    "cycles": 3200000000,
+    "instructions": 9000000000,
+    "ipc": 2.81,
+    "l1_miss_rate": 2.8,
+    "llc_miss_rate": 1.5,
+    "branch_miss_rate": 2.2
+  },
+  "after": {
+    "execution_time": 80,
+    "cycles": 2600000000,
+    "instructions": 7800000000,
+    "ipc": 3.0,
+    "l1_miss_rate": 1.8,
+    "llc_miss_rate": 1.2,
+    "branch_miss_rate": 2.1
+  },
+  "transform_insights": {
+    "name": "Loop Tiling",
+    "description": "Splits a single loop into an outer tile loop and an inner loop that processes one tile at a time. Each tile fits in L1 cache, improving temporal locality.",
+    "why_helped": [
+      { "metric": "L1 miss rate", "before": 2.8, "after": 1.8, "unit": "%", "explanation": "Tiling keeps the working set within L1 cache size. Each tile (4 elements x 8 bytes = 32 bytes) fits entirely in a cache line, eliminating conflict misses." },
+      { "metric": "Execution time", "before": 120, "after": 80, "unit": "ms", "explanation": "33% speedup primarily driven by reduced cache miss latency. Fewer L1 misses mean fewer stalls waiting for data from L2/L3." },
+      { "metric": "Cycles", "before": 3.2, "after": 2.6, "unit": "G", "explanation": "Lower cycle count due to reduced memory stall cycles. The CPU spends more time computing and less time waiting for cache refills." },
+      { "metric": "IPC", "before": 2.81, "after": 3.0, "unit": "", "explanation": "Better IPC because the pipeline stalls less often. With data already in L1, the out-of-order engine keeps execution units busier." }
+    ],
+    "why_hurt": [
+      { "metric": "Instruction count", "before": 9.0, "after": 7.8, "unit": "G", "explanation": "Tiling added outer-loop overhead (tile index computation, min/max bounds). Despite this, total instructions decreased because the compiler eliminated redundant bounds checks." }
+    ],
+    "trade_offs": [
+      "Tile size (4) is hardcoded — optimal for L1 line size of this target. Different architectures may need different tile sizes.",
+      "Added code complexity: 1 loop became 2 nested loops (21 vs 11 instructions in the function body).",
+      "Trip count for the inner loop is now a complex SCEV expression, which may inhibit further optimizations like vectorization."
+    ]
+  }
+}

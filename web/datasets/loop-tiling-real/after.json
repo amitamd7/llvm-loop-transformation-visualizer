@@ -1,0 +1,204 @@
+{
+  "functions": [
+    {
+      "cfg": {
+        "edges": [
+          {
+            "from": "b0",
+            "to": "b1"
+          },
+          {
+            "from": "b1",
+            "to": "b7"
+          },
+          {
+            "from": "b1",
+            "to": "b2"
+          },
+          {
+            "from": "b2",
+            "to": "b3"
+          },
+          {
+            "from": "b3",
+            "to": "b6"
+          },
+          {
+            "from": "b3",
+            "to": "b4"
+          },
+          {
+            "from": "b4",
+            "to": "b5"
+          },
+          {
+            "from": "b5",
+            "to": "b3"
+          },
+          {
+            "from": "b6",
+            "to": "b1"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "b0",
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "entry"
+          },
+          {
+            "id": "b1",
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 3
+            },
+            "label": "outer"
+          },
+          {
+            "id": "b2",
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "inner_entry"
+          },
+          {
+            "id": "b3",
+            "instructions": {
+              "arith": 4,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 6
+            },
+            "label": "inner"
+          },
+          {
+            "id": "b4",
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 3,
+              "other": 0,
+              "total": 5
+            },
+            "label": "body"
+          },
+          {
+            "id": "b5",
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 2
+            },
+            "label": "inner_step"
+          },
+          {
+            "id": "b6",
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 2
+            },
+            "label": "outer_inc"
+          },
+          {
+            "id": "b7",
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "exit"
+          }
+        ]
+      },
+      "instruction_count": 21,
+      "loops": [
+        {
+          "blocks": [
+            "outer",
+            "inner_entry",
+            "inner",
+            "body",
+            "inner_step",
+            "outer_inc"
+          ],
+          "dependencies": [],
+          "depth": 1,
+          "header": "outer",
+          "id": "tile_demo::outer::0",
+          "induction_variable": "t",
+          "memory_accesses": [],
+          "trip_count": "unknown"
+        },
+        {
+          "blocks": [
+            "inner",
+            "body",
+            "inner_step"
+          ],
+          "dependencies": [
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "v",
+              "to_var": "v",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Write-after-read (anti) dependence",
+              "distance": 0,
+              "from_var": "v",
+              "to_var": "p",
+              "type": "anti"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "p",
+              "to_var": "p",
+              "type": "output"
+            }
+          ],
+          "depth": 2,
+          "header": "inner",
+          "id": "tile_demo::inner::1",
+          "induction_variable": "i",
+          "memory_accesses": [
+            {
+              "array": "A",
+              "pattern": "stride-1",
+              "type": "load"
+            },
+            {
+              "array": "A",
+              "pattern": "stride-1",
+              "type": "store"
+            }
+          ],
+          "trip_count": "(1 + ((zext i32 ({0,+,-4}<%outer> + ({0,+,4}<%outer> smax {4,+,4}<%outer>)) to i33) umin (zext i32 ({0,+,-4}<%outer> + ({0,+,4}<%outer> smax %N)) to i33)))<nuw><nsw>"
+        }
+      ],
+      "name": "tile_demo"
+    }
+  ]
+}

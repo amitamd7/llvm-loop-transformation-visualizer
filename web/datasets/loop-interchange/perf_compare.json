@@ -1,0 +1,36 @@
+{
+  "before": {
+    "execution_time": 210,
+    "cycles": 5800000000,
+    "instructions": 10500000000,
+    "ipc": 1.81,
+    "l1_miss_rate": 24.5,
+    "llc_miss_rate": 8.2,
+    "branch_miss_rate": 1.1
+  },
+  "after": {
+    "execution_time": 38,
+    "cycles": 1020000000,
+    "instructions": 10500000000,
+    "ipc": 10.29,
+    "l1_miss_rate": 0.8,
+    "llc_miss_rate": 0.1,
+    "branch_miss_rate": 1.1
+  },
+  "transform_insights": {
+    "name": "Loop Interchange",
+    "description": "Swaps the loop nesting order so that the inner loop iterates over the fastest-varying (contiguous) dimension of the matrix M. Before: outer=j (columns), inner=i (rows) caused column-major traversal. After: outer=i (rows), inner=j (columns) achieves row-major traversal matching C's memory layout.",
+    "why_helped": [
+      { "metric": "l1_miss_rate", "before": 24.5, "after": 0.8, "unit": "%", "explanation": "Row-major access (stride-1) means consecutive M[i][j] and M[i][j+1] are adjacent in memory and share the same cache line. Column-major access jumped by N*sizeof(double) bytes each iteration, missing L1 on nearly every access." },
+      { "metric": "llc_miss_rate", "before": 8.2, "after": 0.1, "unit": "%", "explanation": "Sequential access enables hardware prefetcher to predict and fetch next cache lines. Column-major access created an irregular pattern the prefetcher could not follow." },
+      { "metric": "execution_time", "before": 210, "after": 38, "unit": "ms", "explanation": "5.5x speedup entirely from eliminating memory stalls. The CPU was spending >80% of time waiting for cache misses before interchange." },
+      { "metric": "ipc", "before": 1.81, "after": 10.29, "unit": "", "explanation": "With data arriving from L1 instead of L2/L3/DRAM, the pipeline stays full. IPC jumps from memory-bound ~1.8 to compute-bound ~10.3." }
+    ],
+    "why_hurt": [],
+    "trade_offs": [
+      "Legality: Loop interchange is only legal when there are no loop-carried dependencies that would be violated by reversing the iteration order. LLVM's dependence analysis must prove this.",
+      "Profitability heuristic: Not all interchanges help — if both loops already access memory sequentially, interchange may hurt. LLVM's cost model checks the access patterns before transforming.",
+      "Instruction count unchanged: This transform changes only iteration order, not the computation. The same number of instructions execute, just in a cache-friendlier order."
+    ]
+  }
+}

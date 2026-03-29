@@ -1,0 +1,44 @@
+{
+  "transform": "Loop Fusion",
+  "source_file": "vec_ops.c",
+  "functions": [
+    {
+      "name": "vec_scale_and_add",
+      "instruction_count": 13,
+      "cfg": {
+        "nodes": [
+          { "id": "b0", "label": "entry", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 1, "other": 1 } },
+          { "id": "b1", "label": "fused.header", "instructions": { "total": 2, "arith": 1, "memory": 0, "branch": 1, "other": 0 } },
+          { "id": "b2", "label": "fused.body", "instructions": { "total": 7, "arith": 2, "memory": 4, "branch": 1, "other": 0 } },
+          { "id": "b3", "label": "exit", "instructions": { "total": 1, "arith": 0, "memory": 0, "branch": 0, "other": 1 } }
+        ],
+        "edges": [
+          { "from": "b0", "to": "b1" },
+          { "from": "b1", "to": "b2" },
+          { "from": "b1", "to": "b3" },
+          { "from": "b2", "to": "b1" }
+        ]
+      },
+      "loops": [
+        {
+          "id": "vec_scale::fused::0",
+          "header": "fused.header",
+          "depth": 1,
+          "blocks": ["fused.header", "fused.body"],
+          "induction_variable": "i",
+          "trip_count": "(1 + (zext i32 (0 smax %N) to i33))<nuw><nsw>",
+          "memory_accesses": [
+            { "array": "A", "pattern": "stride-1", "type": "load" },
+            { "array": "A", "pattern": "stride-1", "type": "store" },
+            { "array": "B", "pattern": "stride-1", "type": "load" },
+            { "array": "C", "pattern": "stride-1", "type": "store" }
+          ],
+          "dependencies": [
+            { "type": "flow", "from_var": "A[i]", "to_var": "A[i]", "distance": 0, "description": "Load A[i], scale by alpha, store back — then immediately load scaled A[i] for addition (kept in register, no memory round-trip)" },
+            { "type": "flow", "from_var": "A[i]", "to_var": "C[i]", "distance": 0, "description": "Scaled A[i] + B[i] stored to C[i] within same iteration — the cross-loop dependency from before is now intra-iteration" }
+          ]
+        }
+      ]
+    }
+  ]
+}

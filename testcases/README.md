@@ -1,5 +1,13 @@
 # Test cases
 
+**Fast path (whole repo):** from the project root, run:
+
+```bash
+./scripts/analyze.sh testcases/loop_tiling_before.ll testcases/loop_tiling_after.ll
+```
+
+That produces `web/before.json`, `web/after.json`, and `web/perf_compare.json` (when `perf` is installed) and opens the server. All CFG, instruction mix, dependency, and chart data is generated **offline** — no AI. Optional LLM setup for ✨ Insights / 💬 Chat is documented in **FEATURES.md**.
+
 ## Loop tiling (`loop_tiling_before.ll` / `loop_tiling_after.ll`)
 
 - **Before:** one counted loop over `i`, load/add/store on `A[i]`.
@@ -64,6 +72,14 @@ cd web && python3 -m http.server 8765
 Leave **Show diff** off. Only keys that match loops in the loaded JSON are used.
 
 **Using real `perf`:** record your binary (e.g. `perf record -e cycles,cache-misses ./a.out`), then attribute hot regions to source/LLVM loops (e.g. `perf report`, scripts, or LLVM line tables) and **paste** representative totals into `by_loop_id` for the ids above. The UI does not run `perf` for you.
+
+**Whole-function before/after counters (`perf_compare.json`):** for the grouped benchmark chart, use `scripts/run-perf.sh` from the repo root (same as `analyze.sh` does):
+
+```bash
+./scripts/run-perf.sh testcases/loop_tiling_before.ll testcases/loop_tiling_after.ll web/
+```
+
+Output is `web/perf_compare.json`. This is independent of the legacy `perf.json` loop-id overlay.
 
 ## Other samples
 
