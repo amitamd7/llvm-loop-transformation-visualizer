@@ -1053,6 +1053,7 @@
     );
     if (!hasAny) return null;
     const result = { before, after };
+    if (Number.isFinite(obj.runs)) result.runs = obj.runs;
     if (obj.transform_insights) result.transform_insights = obj.transform_insights;
     return result;
   }
@@ -1167,10 +1168,13 @@
       const cls = summary.speedupPct >= 0 ? 'rms-pos' : 'rms-neg';
       speedupHtml = `<strong class="${cls}">${summary.speedupPct.toFixed(1)}%</strong> <span class="rms-muted">(from ${summary.speedupSource})</span>`;
     }
+    const runsNote = dataRunMetrics && dataRunMetrics.runs
+      ? `<div class="rms-row rms-muted" style="font-size:.85em">Values averaged over ${dataRunMetrics.runs} runs</div>` : '';
     el.innerHTML = `
       <div class="rms-row">Speedup: ${speedupHtml}</div>
       <div class="rms-row">Key improvement: <strong>${escapeHtml(summary.keyImp)}</strong></div>
       <div class="rms-row">Potential issue: <strong>${escapeHtml(summary.keyIssue)}</strong></div>
+      ${runsNote}
     `;
   }
 
@@ -1438,6 +1442,11 @@
       const el = document.getElementById('run-metrics-summary');
       if (el) el.innerHTML = '';
       return;
+    }
+    const heading = panel.querySelector('.run-metrics-heading');
+    if (heading) {
+      const n = dataRunMetrics.runs;
+      heading.textContent = n ? `Benchmark comparison (avg of ${n} runs)` : 'Benchmark comparison';
     }
     renderRunMetricsChart();
     renderInsightsPanel();

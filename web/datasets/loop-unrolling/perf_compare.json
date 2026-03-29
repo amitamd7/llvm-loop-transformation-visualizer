@@ -1,9 +1,10 @@
 {
+  "runs": 5,
   "before": {
     "execution_time": 95,
     "cycles": 2500000000,
     "instructions": 6000000000,
-    "ipc": 2.40,
+    "ipc": 2.4,
     "l1_miss_rate": 1.2,
     "llc_miss_rate": 0.4,
     "branch_miss_rate": 8.5
@@ -21,16 +22,40 @@
     "name": "Loop Unrolling (factor 4)",
     "description": "Replicates the loop body 4 times per iteration, reducing the loop overhead (branch, compare, increment) by 4x. Adds an epilog loop to handle remaining iterations when N is not a multiple of 4.",
     "why_helped": [
-      { "metric": "branch_miss_rate", "before": 8.5, "after": 2.1, "unit": "%", "explanation": "4x fewer loop-back branches means the branch predictor has 4x fewer opportunities to mispredict the loop exit." },
-      { "metric": "ipc", "before": 2.40, "after": 3.43, "unit": "", "explanation": "With fewer branches stalling the pipeline, the CPU's out-of-order engine keeps more execution units busy processing the 4 loads and adds per iteration." },
-      { "metric": "execution_time", "before": 95, "after": 52, "unit": "ms", "explanation": "45% speedup from eliminated branch overhead and better instruction-level parallelism across the 4 unrolled copies." }
+      {
+        "metric": "branch_miss_rate",
+        "before": 8.5,
+        "after": 2.1,
+        "unit": "%",
+        "explanation": "4x fewer loop-back branches means the branch predictor has 4x fewer opportunities to mispredict the loop exit."
+      },
+      {
+        "metric": "ipc",
+        "before": 2.4,
+        "after": 3.43,
+        "unit": "",
+        "explanation": "With fewer branches stalling the pipeline, the CPU's out-of-order engine keeps more execution units busy processing the 4 loads and adds per iteration."
+      },
+      {
+        "metric": "execution_time",
+        "before": 95,
+        "after": 52,
+        "unit": "ms",
+        "explanation": "45% speedup from eliminated branch overhead and better instruction-level parallelism across the 4 unrolled copies."
+      }
     ],
     "why_hurt": [
-      { "metric": "instructions", "before": 6000000000, "after": 4800000000, "unit": "", "explanation": "Although total dynamic instructions decreased (fewer loop overhead instructions), the static code size increased. The epilog loop adds extra instructions for cleanup." }
+      {
+        "metric": "instructions",
+        "before": 6000000000,
+        "after": 4800000000,
+        "unit": "",
+        "explanation": "Although total dynamic instructions decreased (fewer loop overhead instructions), the static code size increased. The epilog loop adds extra instructions for cleanup."
+      }
     ],
     "trade_offs": [
       "Instruction cache pressure: 4x code duplication increases I-cache footprint. With large loop bodies, this could cause I-cache misses that negate the branch reduction benefit.",
-      "Epilog overhead: For small N (< 4), the epilog loop does all the work and the main loop never executes — no benefit from unrolling.",
+      "Epilog overhead: For small N (< 4), the epilog loop does all the work and the main loop never executes \u2014 no benefit from unrolling.",
       "Register pressure: 4 simultaneous partial sums may spill registers on architectures with few GPRs, though x86-64 has enough."
     ]
   }

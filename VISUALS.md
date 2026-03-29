@@ -59,10 +59,13 @@ make LLVM_CONFIG=/path/to/llvm-config
 ./scripts/run-perf.sh before.ll after.ll web/
 ```
 
+This runs each binary 5 times (configurable: `PERF_RUNS=10 ./scripts/run-perf.sh …`) and writes averaged counters. The `"runs"` field in the JSON tells the UI how many iterations were averaged.
+
 **Hand-written** `web/perf_compare.json`:
 
 ```json
 {
+  "runs": 5,
   "before": { "execution_time": 120, "cycles": 3200000000, "ipc": 2.81, "l1_miss_rate": 2.8 },
   "after":  { "execution_time": 80,  "cycles": 2600000000, "ipc": 3.0,  "l1_miss_rate": 1.8 }
 }

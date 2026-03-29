@@ -41,7 +41,7 @@ run_perf "$TMPDIR/before_bin" "before" "$TMPDIR/perf_before.csv"
 run_perf "$TMPDIR/after_bin" "after" "$TMPDIR/perf_after.csv"
 
 echo "==> Generating perf_compare.json..."
-python3 - "$TMPDIR/perf_before.csv" "$TMPDIR/perf_after.csv" "$OUTDIR/perf_compare.json" << 'PYEOF'
+python3 - "$TMPDIR/perf_before.csv" "$TMPDIR/perf_after.csv" "$OUTDIR/perf_compare.json" "$RUNS" << 'PYEOF'
 import sys, json, re
 
 def parse_perf_csv(path):
@@ -82,11 +82,12 @@ def build_result(m):
 
 bm = parse_perf_csv(sys.argv[1])
 am = parse_perf_csv(sys.argv[2])
-out = {'before': build_result(bm), 'after': build_result(am)}
+runs = int(sys.argv[4]) if len(sys.argv) > 4 else 5
+out = {'runs': runs, 'before': build_result(bm), 'after': build_result(am)}
 
 with open(sys.argv[3], 'w') as f:
     json.dump(out, f, indent=2)
-print(f"Wrote {sys.argv[3]}")
+print(f"Wrote {sys.argv[3]} (averaged over {runs} runs)")
 PYEOF
 
 echo "==> Done. Performance data written to $OUTDIR/perf_compare.json"

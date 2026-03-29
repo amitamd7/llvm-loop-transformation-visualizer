@@ -43,12 +43,13 @@ Output: a single JSON file per IR file.
 
 `perf_compare.json` is a JSON object with `before` and `after` fields containing hardware counter measurements:
 
+- `runs` — number of `perf stat` iterations (default 5); displayed in the chart heading
 - `execution_time`, `cycles`, `instructions`, `ipc`
 - `l1_miss_rate`, `llc_miss_rate`, `branch_miss_rate`
 
 Optionally includes `transform_insights` with structured explanations of why metrics changed.
 
-This file is produced by `scripts/run-perf.sh` (invoked from `analyze.sh` or manually) or hand-authored. Without it, charts and some insight text are omitted; the CFG and node panels still work.
+This file is produced by `scripts/run-perf.sh` (invoked from `analyze.sh` or manually) or hand-authored. By default `perf stat -r 5` is used, so every counter is the average of 5 runs; override with `PERF_RUNS=N`. The `"runs"` field in the JSON is displayed in the UI heading. Without this file, charts and some insight text are omitted; the CFG and node panels still work.
 
 ### 3. Browser loads JSON
 

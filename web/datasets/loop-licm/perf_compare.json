@@ -1,4 +1,5 @@
 {
+  "runs": 5,
   "before": {
     "execution_time": 2.84,
     "cycles": 9320000,
