@@ -22,7 +22,9 @@
         ],
         "nodes": [
           {
+            "cost": 2,
             "id": "b0",
+            "impact": 2,
             "instructions": {
               "arith": 0,
               "branch": 1,
@@ -33,7 +35,9 @@
             "label": "entry"
           },
           {
+            "cost": 4,
             "id": "b1",
+            "impact": 400,
             "instructions": {
               "arith": 1,
               "branch": 1,
@@ -44,7 +48,9 @@
             "label": "loop"
           },
           {
+            "cost": 26,
             "id": "b2",
+            "impact": 2600,
             "instructions": {
               "arith": 2,
               "branch": 1,
@@ -55,7 +61,9 @@
             "label": "body"
           },
           {
+            "cost": 2,
             "id": "b3",
+            "impact": 2,
             "instructions": {
               "arith": 0,
               "branch": 1,
@@ -74,32 +82,17 @@
             "loop",
             "body"
           ],
-          "dependencies": [
-            {
-              "description": "Write-after-read (anti) dependence",
-              "distance": 0,
-              "from_var": "v",
-              "to_var": "p",
-              "type": "anti"
-            }
+          "critical_path": [
+            "loop",
+            "body"
           ],
+          "dependencies": [],
           "depth": 1,
           "header": "loop",
           "id": "tile_demo::loop::0",
-          "induction_variable": "i",
-          "memory_accesses": [
-            {
-              "array": "A",
-              "pattern": "stride-1",
-              "type": "load"
-            },
-            {
-              "array": "A",
-              "pattern": "stride-1",
-              "type": "store"
-            }
-          ],
-          "trip_count": "(1 + (zext i32 (0 smax %N) to i33))<nuw><nsw>"
+          "induction_variable": "",
+          "memory_accesses": [],
+          "trip_count": "unknown"
         }
       ],
       "name": "tile_demo"

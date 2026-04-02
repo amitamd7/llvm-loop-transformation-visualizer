@@ -89,7 +89,11 @@ A web tool where you paste LLVM IR and get a rendered CFG.
 | Instruction mix per block | — | — | — | — | — | **yes** |
 | Loop execution animation | — | — | — | — | — | **yes** |
 | Auto-detect transform type | — | — | — | — | — | **yes** |
-| Integrated perf profiling | — | — | — | — | — | **yes** |
+| Integrated perf profiling (CPU + GPU) | — | — | — | — | — | **yes** |
+| Critical path highlighting per loop | — | — | — | — | — | **yes** |
+| Per-block cost & impact scoring | — | — | — | — | — | **yes** |
+| GPU profiling (rocprof / VALU / L2) | — | — | — | — | — | **yes** |
+| Optimization remarks (Passed/Missed) | — | — | — | partial | — | **yes** |
 | AI-powered insights (optional LLM) | — | — | — | — | — | **yes** |
 | Interactive AI chatbot (optional LLM) | — | — | — | — | — | **yes** |
 | Rule-based insights / chat (no API) | — | — | — | — | — | **yes** |
