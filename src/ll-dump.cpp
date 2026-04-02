@@ -16,7 +16,6 @@
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
-#include "llvm/IR/IntrinsicInst.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/LLVMContext.h"
@@ -120,12 +119,27 @@ static void peelGEPChain(Value *Ptr, Value *&Base,
   return "unknown";
 }
 
+/// Fast IR-level check: does the loop have a simple constant-bound comparison?
+/// Avoids calling SCEV entirely to prevent hangs on complex trip count expressions.
+static bool hasSimpleBound(Loop *L) {
+  BasicBlock *Exiting = L->getExitingBlock();
+  if (!Exiting) return false;
+  auto *BI = dyn_cast<BranchInst>(Exiting->getTerminator());
+  if (!BI || !BI->isConditional()) return false;
+  auto *Cmp = dyn_cast<ICmpInst>(cast<CondBrInst>(BI)->getCondition());
+  if (!Cmp) return false;
+  return isa<ConstantInt>(Cmp->getOperand(0)) ||
+         isa<ConstantInt>(Cmp->getOperand(1));
+}
+
 static std::string tripCountString(ScalarEvolution &SE, Loop *L) {
-  const SCEV *BTC = SE.getBackedgeTakenCount(L);
-  if (isa<SCEVCouldNotCompute>(BTC))
-    return "unknown";
-  const SCEV *Trip = SE.getTripCountFromExitCount(BTC);
-  return scevToString(Trip);
+  unsigned TC = SE.getSmallConstantTripCount(L);
+  if (TC > 0)
+    return std::to_string(TC);
+  unsigned MaxTC = SE.getSmallConstantMaxTripCount(L);
+  if (MaxTC > 0)
+    return "at most " + std::to_string(MaxTC);
+  return "unknown";
 }
 
 static std::string inductionVariableString(ScalarEvolution &SE, Loop *L) {
@@ -204,6 +218,9 @@ static void appendDependenciesJson(Loop *L, LoopInfo &LI,
         MemInsts.push_back(&I);
   }
 
+  if (MemInsts.size() > 64)
+    return;
+
   DenseSet<std::pair<Instruction *, Instruction *>> Seen;
   for (unsigned i = 0, e = MemInsts.size(); i < e; ++i) {
     for (unsigned j = i; j < e; ++j) {
@@ -273,6 +290,116 @@ static void appendDependenciesJson(Loop *L, LoopInfo &LI,
   }
 }
 
+/// Weighted cost for a basic block: memory ops × 10, arith × 1, branch × 2.
+static int64_t blockCost(const BasicBlock &BB) {
+  int64_t Cost = 0;
+  for (const Instruction &I : BB) {
+    if (isa<LoadInst>(I) || isa<StoreInst>(I) || isa<AtomicRMWInst>(I) ||
+        isa<AtomicCmpXchgInst>(I))
+      Cost += 10;
+    else if (isa<GetElementPtrInst>(I) || isa<AllocaInst>(I))
+      Cost += 2;
+    else if (isa<BinaryOperator>(I) || isa<ICmpInst>(I) || isa<FCmpInst>(I) ||
+             isa<UnaryOperator>(I) || isa<SelectInst>(I))
+      Cost += 1;
+    else if (I.isTerminator() || isa<InvokeInst>(I))
+      Cost += 2;
+    else
+      Cost += 1;
+  }
+  return Cost;
+}
+
+/// Estimate trip count as a number (returns 0 if unknown).
+/// Uses only lightweight queries to avoid expensive SCEV computations.
+static int64_t numericTripCount(Loop *L) {
+  if (!L->getLoopLatch() || !L->getExitingBlock())
+    return 0;
+  BasicBlock *Exiting = L->getExitingBlock();
+  if (!Exiting)
+    return 0;
+  auto *BI = dyn_cast<BranchInst>(Exiting->getTerminator());
+  if (!BI || !BI->isConditional())
+    return 0;
+  auto *Cmp = dyn_cast<ICmpInst>(cast<CondBrInst>(BI)->getCondition());
+  if (!Cmp)
+    return 0;
+  for (unsigned I = 0; I < 2; ++I) {
+    if (auto *CI = dyn_cast<ConstantInt>(Cmp->getOperand(I))) {
+      int64_t V = CI->getSExtValue();
+      if (V > 0 && V < 100000)
+        return V;
+    }
+  }
+  return 0;
+}
+
+/// Compute impact = blockCost × product of enclosing trip counts.
+static int64_t computeImpact(const BasicBlock &BB, LoopInfo &LI) {
+  int64_t Cost = blockCost(BB);
+  int64_t TripProduct = 1;
+  Loop *L = LI.getLoopFor(&BB);
+  while (L) {
+    int64_t TC = numericTripCount(L);
+    if (TC > 0)
+      TripProduct *= TC;
+    else
+      TripProduct *= 100;
+    L = L->getParentLoop();
+  }
+  return Cost * TripProduct;
+}
+
+/// Find the critical path within a loop: longest-cost chain of basic blocks
+/// following forward CFG edges. Returns ordered list of block labels.
+static json::Array computeCriticalPath(Loop *L, LoopInfo &LI) {
+  SmallVector<BasicBlock *, 16> Blocks(L->blocks().begin(), L->blocks().end());
+  DenseMap<BasicBlock *, int64_t> LongestTo;
+  DenseMap<BasicBlock *, BasicBlock *> PredOnPath;
+
+  for (BasicBlock *BB : Blocks) {
+    LongestTo[BB] = blockCost(*BB);
+    PredOnPath[BB] = nullptr;
+  }
+
+  bool Changed = true;
+  for (int Iter = 0; Iter < (int)Blocks.size() && Changed; ++Iter) {
+    Changed = false;
+    for (BasicBlock *BB : Blocks) {
+      for (BasicBlock *Succ : successors(BB)) {
+        if (!L->contains(Succ)) continue;
+        if (LI.isLoopHeader(Succ)) continue;
+        int64_t NewDist = LongestTo[BB] + blockCost(*Succ);
+        if (NewDist > LongestTo[Succ]) {
+          LongestTo[Succ] = NewDist;
+          PredOnPath[Succ] = BB;
+          Changed = true;
+        }
+      }
+    }
+  }
+
+  BasicBlock *EndBlock = Blocks[0];
+  for (BasicBlock *BB : Blocks)
+    if (LongestTo[BB] > LongestTo[EndBlock])
+      EndBlock = BB;
+
+  SmallVector<std::string, 8> PathLabels;
+  DenseSet<BasicBlock *> Visited;
+  BasicBlock *Cur = EndBlock;
+  while (Cur && !Visited.count(Cur)) {
+    Visited.insert(Cur);
+    PathLabels.push_back(basicBlockDisplayName(*Cur));
+    Cur = PredOnPath[Cur];
+  }
+  std::reverse(PathLabels.begin(), PathLabels.end());
+
+  json::Array Path;
+  for (const auto &Lbl : PathLabels)
+    Path.push_back(Lbl);
+  return Path;
+}
+
 static void addLoopTreeToJson(Loop *L, LoopInfo &LI, ScalarEvolution &SE,
                               DependenceInfo &DI,
                               Function &F, unsigned &Seq, json::Array &Loops) {
@@ -284,21 +411,26 @@ static void addLoopTreeToJson(Loop *L, LoopInfo &LI, ScalarEvolution &SE,
   for (BasicBlock *BB : L->getBlocks())
     Blocks.push_back(basicBlockDisplayName(*BB));
 
+  bool simpleBound = hasSimpleBound(L);
+
   json::Array Mem;
-  appendMemoryAccessesJson(LI, SE, L, Mem);
+  if (simpleBound)
+    appendMemoryAccessesJson(LI, SE, L, Mem);
 
   json::Array Deps;
-  appendDependenciesJson(L, LI, DI, Deps);
+  if (simpleBound)
+    appendDependenciesJson(L, LI, DI, Deps);
 
   json::Object LObj;
   LObj.try_emplace("id", std::move(Id));
   LObj.try_emplace("header", basicBlockDisplayName(*L->getHeader()));
   LObj.try_emplace("depth", static_cast<int64_t>(L->getLoopDepth()));
-  LObj.try_emplace("trip_count", tripCountString(SE, L));
-  LObj.try_emplace("induction_variable", inductionVariableString(SE, L));
+  LObj.try_emplace("trip_count", simpleBound ? tripCountString(SE, L) : "unknown");
+  LObj.try_emplace("induction_variable", simpleBound ? inductionVariableString(SE, L) : "");
   LObj.try_emplace("blocks", std::move(Blocks));
   LObj.try_emplace("memory_accesses", std::move(Mem));
   LObj.try_emplace("dependencies", std::move(Deps));
+  LObj.try_emplace("critical_path", computeCriticalPath(L, LI));
   Loops.push_back(std::move(LObj));
 
   for (Loop *Sub : L->getSubLoops())
@@ -330,7 +462,7 @@ static json::Object classifyInstructions(const BasicBlock &BB) {
   return Obj;
 }
 
-static json::Object functionCfgJson(Function &F) {
+static json::Object functionCfgJson(Function &F, LoopInfo &LI) {
   DenseMap<const BasicBlock *, std::string> BId;
   unsigned N = 0;
   for (BasicBlock &BB : F)
@@ -342,6 +474,8 @@ static json::Object functionCfgJson(Function &F) {
     Node.try_emplace("id", BId[&BB]);
     Node.try_emplace("label", basicBlockDisplayName(BB));
     Node.try_emplace("instructions", classifyInstructions(BB));
+    Node.try_emplace("cost", blockCost(BB));
+    Node.try_emplace("impact", computeImpact(BB, LI));
     Nodes.push_back(std::move(Node));
   }
 
@@ -379,7 +513,7 @@ static json::Object functionToJson(Function &F, LoopInfo &LI,
   json::Object Fo;
   Fo.try_emplace("name", std::string(F.getName()));
   Fo.try_emplace("loops", std::move(Loops));
-  Fo.try_emplace("cfg", functionCfgJson(F));
+  Fo.try_emplace("cfg", functionCfgJson(F, LI));
   Fo.try_emplace("instruction_count", static_cast<int64_t>(countInstructions(F)));
   return Fo;
 }
@@ -417,9 +551,10 @@ int main(int argc, char **argv) {
     DominatorTree DT(F);
     LoopInfo LI(DT);
 
-    Triple TT(F.getParent()->getTargetTriple());
-    if (TT.getTriple().empty())
-      TT = Triple(llvm::sys::getDefaultTargetTriple());
+    const Triple &ModTriple = F.getParent()->getTargetTriple();
+    Triple TT = ModTriple.getTriple().empty()
+                    ? Triple(llvm::sys::getDefaultTargetTriple())
+                    : ModTriple;
     TargetLibraryInfoImpl TLII(TT);
     TargetLibraryInfo TLI(TLII);
     AssumptionCache AC(F);

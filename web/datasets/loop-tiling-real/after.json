@@ -42,7 +42,9 @@
         ],
         "nodes": [
           {
+            "cost": 2,
             "id": "b0",
+            "impact": 2,
             "instructions": {
               "arith": 0,
               "branch": 1,
@@ -53,7 +55,9 @@
             "label": "entry"
           },
           {
+            "cost": 4,
             "id": "b1",
+            "impact": 400,
             "instructions": {
               "arith": 1,
               "branch": 1,
@@ -64,7 +68,9 @@
             "label": "outer"
           },
           {
+            "cost": 2,
             "id": "b2",
+            "impact": 200,
             "instructions": {
               "arith": 0,
               "branch": 1,
@@ -75,7 +81,9 @@
             "label": "inner_entry"
           },
           {
+            "cost": 7,
             "id": "b3",
+            "impact": 70000,
             "instructions": {
               "arith": 4,
               "branch": 1,
@@ -86,7 +94,9 @@
             "label": "inner"
           },
           {
+            "cost": 25,
             "id": "b4",
+            "impact": 250000,
             "instructions": {
               "arith": 1,
               "branch": 1,
@@ -97,7 +107,9 @@
             "label": "body"
           },
           {
+            "cost": 3,
             "id": "b5",
+            "impact": 30000,
             "instructions": {
               "arith": 1,
               "branch": 1,
@@ -108,7 +120,9 @@
             "label": "inner_step"
           },
           {
+            "cost": 3,
             "id": "b6",
+            "impact": 300,
             "instructions": {
               "arith": 1,
               "branch": 1,
@@ -119,7 +133,9 @@
             "label": "outer_inc"
           },
           {
+            "cost": 2,
             "id": "b7",
+            "impact": 2,
             "instructions": {
               "arith": 0,
               "branch": 1,
@@ -142,11 +158,16 @@
             "inner_step",
             "outer_inc"
           ],
+          "critical_path": [
+            "inner",
+            "body",
+            "inner_step"
+          ],
           "dependencies": [],
           "depth": 1,
           "header": "outer",
           "id": "tile_demo::outer::0",
-          "induction_variable": "t",
+          "induction_variable": "",
           "memory_accesses": [],
           "trip_count": "unknown"
         },
@@ -156,46 +177,18 @@
             "body",
             "inner_step"
           ],
-          "dependencies": [
-            {
-              "description": "Loop-carried dependence (distance 0)",
-              "distance": 0,
-              "from_var": "v",
-              "to_var": "v",
-              "type": "loop-carried"
-            },
-            {
-              "description": "Write-after-read (anti) dependence",
-              "distance": 0,
-              "from_var": "v",
-              "to_var": "p",
-              "type": "anti"
-            },
-            {
-              "description": "Write-after-write (output) dependence",
-              "distance": 0,
-              "from_var": "p",
-              "to_var": "p",
-              "type": "output"
-            }
+          "critical_path": [
+            "inner",
+            "body",
+            "inner_step"
           ],
+          "dependencies": [],
           "depth": 2,
           "header": "inner",
           "id": "tile_demo::inner::1",
-          "induction_variable": "i",
-          "memory_accesses": [
-            {
-              "array": "A",
-              "pattern": "stride-1",
-              "type": "load"
-            },
-            {
-              "array": "A",
-              "pattern": "stride-1",
-              "type": "store"
-            }
-          ],
-          "trip_count": "(1 + ((zext i32 ({0,+,-4}<%outer> + ({0,+,4}<%outer> smax {4,+,4}<%outer>)) to i33) umin (zext i32 ({0,+,-4}<%outer> + ({0,+,4}<%outer> smax %N)) to i33)))<nuw><nsw>"
+          "induction_variable": "",
+          "memory_accesses": [],
+          "trip_count": "unknown"
         }
       ],
       "name": "tile_demo"
