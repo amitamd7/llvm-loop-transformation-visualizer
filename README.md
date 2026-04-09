@@ -36,7 +36,7 @@ The **dataset dropdown** is optional: it ships **curated** JSON under `web/datas
 ```bash
 git clone <repo-url>
 cd llvm-loop-transform-visualiser
-./run_pipeline.sh testcases/gpu_reduction.c loop-unroll       # GPU kernel (amdgcn)
+./run_pipeline.sh testcases/gpu_reduction.c loop-unroll --gpu gfx90a   # AMDGPU kernel
 ./run_pipeline.sh testcases/jacobi_stencil.c licm             # CPU stencil
 ```
 

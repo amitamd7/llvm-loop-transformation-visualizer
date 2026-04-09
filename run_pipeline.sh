@@ -9,9 +9,14 @@
 #   ./run_pipeline.sh input.c "loop-unroll,licm"
 #   ./run_pipeline.sh input.c loop-vectorize --port 9000
 #   ./run_pipeline.sh input.c loop-interchange --no-serve
+#   ./run_pipeline.sh testcases/gpu_reduction.c loop-unroll --gpu gfx90a
 #
 # What it does (zero manual/AI steps):
-#   1. Compiles C/C++ → LLVM IR (clean SSA, no optnone)
+#   1. Compiles C/C++ → LLVM IR
+#      • Host (default): -O0 + opt prep (mem2reg, …) → before.ll
+#      • GPU (--gpu MCPU): clang -target amdgcn-amd-amdhsa -mcpu=MCPU
+#        -O1 -fno-unroll-loops → before.ll (AMDGPU stack in addrspace(5)
+#        often blocks mem2reg at -O0; this path is script-driven, not “AI”.)
 #   2. Applies opt -passes=<PASS> → transformed IR
 #   3. Runs ll-dump on both → CFG + loop + memory JSON
 #   4. Runs perf stat or rocprof → perf_compare.json
@@ -30,6 +35,8 @@
 #   PORT         — HTTP server port    (default: 8765)
 #   PROFILER     — force perf or rocprof
 #   GPU_ARCH     — GPU target (e.g. gfx90a) — forces rocprof
+#   GPU_MCPU     — if set (or use --gpu MCPU), AMDGPU kernel compile path above
+#   CLANG_GPU_TRIPLE — default amdgcn-amd-amdhsa
 #   PERF_RUNS    — number of perf stat iterations (default: 5)
 # ═══════════════════════════════════════════════════════════════════
 set -euo pipefail
@@ -39,18 +46,25 @@ SOURCE=""
 PASS=""
 SERVE=1
 USER_PORT=""
+GPU_MCPU="${GPU_MCPU:-}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --port)    USER_PORT="$2"; shift 2 ;;
     --no-serve) SERVE=0; shift ;;
+    --gpu)     GPU_MCPU="$2"; shift 2 ;;
     -h|--help)
-      echo "Usage: $0 <source.c> <pass-name> [--port N] [--no-serve]"
+      echo "Usage: $0 <source.c> <pass-name> [--gpu MCPU] [--port N] [--no-serve]"
       echo ""
       echo "Examples:"
       echo "  $0 test.c loop-unroll"
       echo "  $0 test.c licm --port 9000"
       echo "  $0 test.c \"loop-unroll,loop-vectorize\" --no-serve"
+      echo "  $0 testcases/gpu_reduction.c loop-unroll --gpu gfx90a"
+      echo ""
+      echo "GPU: use --gpu gfx90a (or set GPU_MCPU=gfx90a). Compiles AMDGPU IR with"
+      echo "     -O1 -fno-unroll-loops as before.ll, then runs opt with your pass."
+      echo "     Same clang/opt as manual commands — encoded here so nothing is ad hoc."
       exit 0 ;;
     *)
       if [ -z "$SOURCE" ]; then
@@ -99,6 +113,8 @@ auto_detect_tools() {
 
 auto_detect_tools
 
+CLANG_GPU_TRIPLE="${CLANG_GPU_TRIPLE:-amdgcn-amd-amdhsa}"
+
 # ---- Ensure ll-dump is built ----
 if [ ! -f "$ROOT_DIR/ll-dump" ]; then
   echo "==> Building ll-dump..."
@@ -110,6 +126,9 @@ echo "║   LLVM Loop-Transform Visualiser — Pipeline     ║"
 echo "╠══════════════════════════════════════════════════╣"
 echo "║  Source : $SOURCE"
 echo "║  Pass   : $PASS"
+if [ -n "$GPU_MCPU" ]; then
+  echo "║  GPU    : $CLANG_GPU_TRIPLE  mcpu=$GPU_MCPU  (automated AMDGPU path)"
+fi
 echo "║  Clang  : $($CLANG --version 2>&1 | head -1)"
 echo "║  Opt    : $($OPT --version 2>&1 | head -1)"
 echo "╚══════════════════════════════════════════════════╝"
@@ -124,13 +143,21 @@ BEFORE_LL="$TMPDIR_PIPE/before.ll"
 AFTER_LL="$TMPDIR_PIPE/after.ll"
 RAW_LL="$TMPDIR_PIPE/raw.ll"
 
-# ---- Step 1: Compile C/C++ → unoptimized IR (no optnone) ----
-echo "==> [1/5] Compiling $SOURCE → raw LLVM IR..."
-"$CLANG" -O0 -Xclang -disable-O0-optnone -emit-llvm -S "$SOURCE" -o "$RAW_LL"
+if [ -n "$GPU_MCPU" ]; then
+  # AMDGPU kernels: -O0 + mem2reg often leaves stack traffic in addrspace(5) and
+  # loop passes may no-op. This path matches a standard “before unroll” baseline.
+  echo "==> [1–2/5] GPU kernel: clang → before.ll ($CLANG_GPU_TRIPLE, -mcpu=$GPU_MCPU, -O1 -fno-unroll-loops)..."
+  "$CLANG" -target "$CLANG_GPU_TRIPLE" -mcpu="$GPU_MCPU" \
+    -O1 -fno-unroll-loops -emit-llvm -S "$SOURCE" -o "$BEFORE_LL"
+else
+  # ---- Step 1: Compile C/C++ → unoptimized IR (no optnone) ----
+  echo "==> [1/5] Compiling $SOURCE → raw LLVM IR..."
+  "$CLANG" -O0 -Xclang -disable-O0-optnone -emit-llvm -S "$SOURCE" -o "$RAW_LL"
 
-# ---- Step 2: Prep passes → clean SSA (before.ll) ----
-echo "==> [2/5] Applying prep passes ($PREP_PASSES) → before.ll..."
-"$OPT" -passes="$PREP_PASSES" "$RAW_LL" -S -o "$BEFORE_LL"
+  # ---- Step 2: Prep passes → clean SSA (before.ll) ----
+  echo "==> [2/5] Applying prep passes ($PREP_PASSES) → before.ll..."
+  "$OPT" -passes="$PREP_PASSES" "$RAW_LL" -S -o "$BEFORE_LL"
+fi
 
 BEFORE_LINES=$(wc -l < "$BEFORE_LL")
 echo "    before.ll: $BEFORE_LINES lines"
@@ -179,13 +206,16 @@ echo "==> [5/5] Performance profiling ($PROF)..."
 
 if [ "$PROF" = "rocprof" ]; then
   if command -v rocprof &>/dev/null; then
-    "$SCRIPT_DIR/run-rocprof.sh" "$BEFORE_LL" "$AFTER_LL" "$WEBDIR"
+    if ! "$SCRIPT_DIR/run-rocprof.sh" "$BEFORE_LL" "$AFTER_LL" "$WEBDIR"; then
+      echo "    rocprof / link step failed (common for bare device IR) — IR + JSON still valid; open the UI for structural analysis."
+    fi
   else
     echo "    rocprof not found — skipping GPU profiling."
   fi
 else
   if command -v perf &>/dev/null; then
-    "$SCRIPT_DIR/run-perf.sh" "$BEFORE_LL" "$AFTER_LL" "$WEBDIR"
+    "$SCRIPT_DIR/run-perf.sh" "$BEFORE_LL" "$AFTER_LL" "$WEBDIR" || \
+      echo "    perf run failed — continuing without perf_compare.json."
   else
     echo "    perf not available — skipping CPU profiling."
     echo "    Install linux-tools-$(uname -r) for hardware counter data."
