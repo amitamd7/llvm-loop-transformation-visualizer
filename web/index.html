@@ -469,12 +469,29 @@
       border-bottom: 1px solid var(--border);
     }
     #run-metrics-panel.visible { display: block; }
+    #run-metrics-panel.gpu-mode { border-top: 3px solid; border-image: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6) 1; }
+    [data-theme="dark"] #run-metrics-panel.gpu-mode { border-image: linear-gradient(90deg, #f472b6, #a78bfa, #60a5fa) 1; }
     .run-metrics-heading {
       margin: 0 0 6px;
       font-size: 13px;
       font-weight: 600;
       color: var(--text);
     }
+    .run-metrics-profiler-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 1px 7px;
+      border-radius: 4px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .run-metrics-profiler-tag.cpu { background: #dbeafe; color: #1e40af; }
+    .run-metrics-profiler-tag.gpu { background: #fce7f3; color: #9d174d; }
+    [data-theme="dark"] .run-metrics-profiler-tag.cpu { background: #1e3a5f; color: #93c5fd; }
+    [data-theme="dark"] .run-metrics-profiler-tag.gpu { background: #4a1942; color: #f9a8d4; }
     .run-metrics-summary {
       display: flex;
       flex-wrap: wrap;
@@ -703,9 +720,11 @@
     [data-theme="dark"] #btn-crit-path:hover { background: #334155; color: var(--text); border-color: #64748b; }
     #btn-crit-path.active { background: #f59e0b; color: #1e293b; border-color: #d97706; }
     [data-theme="dark"] #btn-crit-path.active { background: #f59e0b; color: #1e293b; border-color: #d97706; }
-    .node-crit rect { stroke: #f59e0b !important; stroke-width: 3px !important; }
-    .edge-crit { stroke: #f59e0b !important; stroke-width: 3px !important; stroke-dasharray: none !important; }
-    .node-impact-badge { font-size: 9px; font-weight: 600; fill: #f59e0b; }
+    .node-crit rect { stroke: #f59e0b !important; stroke-width: 2.5px !important; filter: drop-shadow(0 0 3px rgba(245,158,11,0.5)) !important; }
+    .edge-crit { stroke: #f59e0b !important; stroke-width: 2.5px !important; stroke-dasharray: none !important; }
+    .node-impact-num { font-size: 7.5px; font-weight: 700; fill: #b45309; pointer-events: none; }
+    [data-theme="dark"] .node-impact-num { fill: #fbbf24; }
+    #color-legend .legend-swatch-critpath { background: #fef3c7; border-color: #f59e0b; border-width: 2.5px; }
     [data-theme="dark"] .mem-chip { background: #334155; border-color: #475569; }
     [data-theme="dark"] .mem-chip.mem-active { background: #431407; border-color: #ea580c; }
     [data-theme="dark"] #color-legend { background: rgba(30,41,59,0.95); }
@@ -777,8 +796,32 @@
     .ai-insight-section.regressed h5 { color: #dc2626; }
     .ai-insight-section.suggestions h5 { color: #2563eb; }
     .ai-insight-section.applications h5 { color: #7c3aed; }
+    .ai-insight-section.expectations h5 { color: #d97706; }
     .ai-insight-section ul { margin: 0; padding-left: 18px; font-size: 13px; }
     .ai-insight-section li { margin-bottom: 4px; }
+
+    .insight-badge { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; }
+    .insight-badge.behaviour-improved { background: #dcfce7; color: #166534; }
+    .insight-badge.behaviour-regressed { background: #fee2e2; color: #991b1b; }
+    .insight-badge.behaviour-mixed { background: #fef9c3; color: #854d0e; }
+    .insight-badge.behaviour-unchanged { background: #e2e8f0; color: #475569; }
+    .insight-badge.bottleneck { background: #ede9fe; color: #5b21b6; }
+    .insight-badge.confidence { background: #e0f2fe; color: #0369a1; }
+    [data-theme="dark"] .insight-badge.behaviour-improved { background: #14532d; color: #86efac; }
+    [data-theme="dark"] .insight-badge.behaviour-regressed { background: #450a0a; color: #fca5a5; }
+    [data-theme="dark"] .insight-badge.behaviour-mixed { background: #422006; color: #fde68a; }
+    [data-theme="dark"] .insight-badge.behaviour-unchanged { background: #1e293b; color: #94a3b8; }
+    [data-theme="dark"] .insight-badge.bottleneck { background: #2e1065; color: #c4b5fd; }
+    [data-theme="dark"] .insight-badge.confidence { background: #0c4a6e; color: #7dd3fc; }
+
+    .signal-details { margin: 10px 0; }
+    .signal-details summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); }
+    .signal-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+    .signal-table th { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .signal-table td { padding: 3px 8px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+    .signal-table tr.sig-up td:last-child { color: #16a34a; font-weight: 600; }
+    .signal-table tr.sig-down td:last-child { color: #dc2626; font-weight: 600; }
+    .signal-table tr.sig-flat td:last-child { color: var(--muted); }
     .ai-loading { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
     .ai-loading .spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -806,12 +849,19 @@
   <header>
     <h1>LLVM Loop Transform Visualizer</h1>
     <select id="dataset-select" title="Choose transformation">
-      <option value="datasets/loop-tiling" selected>Loop Tiling</option>
-      <option value="datasets/loop-unrolling">Loop Unrolling</option>
-      <option value="datasets/loop-interchange">Loop Interchange</option>
-      <option value="datasets/loop-fusion">Loop Fusion</option>
-      <option value="datasets/loop-licm">LICM</option>
-      <option value="datasets/loop-tiling-real">Loop Tiling (from IR)</option>
+      <option value="" selected>Latest analysis (from run_pipeline.sh)</option>
+      <optgroup label="Reference snapshots">
+        <option value="datasets/loop-tiling">Loop Tiling</option>
+        <option value="datasets/loop-unrolling">Loop Unrolling</option>
+        <option value="datasets/loop-interchange">Loop Interchange</option>
+        <option value="datasets/loop-fusion">Loop Fusion</option>
+        <option value="datasets/loop-licm">LICM</option>
+        <option value="datasets/loop-tiling-real">Loop Tiling (from IR)</option>
+        <option value="datasets/licm-vecadd">LICM – vecadd (from IR)</option>
+        <option value="datasets/gpu-vecadd">GPU Tiling – MI210 (rocprof)</option>
+        <option value="datasets/loop-split-openmp">OpenMP loop split (branch IR + perf)</option>
+        <option value="datasets/amdgpu-loop-unroll">AMDGPU offload – loop unroll (IR + rocprof)</option>
+      </optgroup>
     </select>
     <span id="transform-badge"></span>
     <label for="fn-select">Function</label>
@@ -835,6 +885,7 @@
           <option value="none">None (static rules only)</option>
           <option value="openai">OpenAI (GPT-4o / GPT-4)</option>
           <option value="anthropic">Anthropic (Claude)</option>
+          <option value="cursor-cloud">Cursor Cloud Agents (API key + local proxy)</option>
           <option value="ollama">Local Ollama</option>
           <option value="custom">Custom OpenAI-compatible endpoint</option>
         </select>
@@ -853,6 +904,20 @@
         <label>API Key</label>
         <input type="password" id="ai-apikey-input" placeholder="sk-..." />
         <div class="ai-hint">Stored in browser localStorage only — never sent to our servers</div>
+      </div>
+      <div class="ai-field" id="ai-field-cursor" style="display:none;">
+        <label>GitHub repository (Cursor Cloud)</label>
+        <input type="text" id="ai-cursor-repo-input" placeholder="https://github.com/you/your-repo" />
+        <div class="ai-hint">Cloud Agent runs against this repo (see scripts/cursor_agent_proxy.py)</div>
+      </div>
+      <div class="ai-field" id="ai-field-cursor-ref" style="display:none;">
+        <label>Git branch / ref</label>
+        <input type="text" id="ai-cursor-ref-input" placeholder="main" />
+      </div>
+      <div class="ai-field" id="ai-field-cursor-proxy" style="display:none;">
+        <label>Proxy base URL</label>
+        <input type="text" id="ai-cursor-proxy-input" placeholder="http://127.0.0.1:8787" />
+        <div class="ai-hint">Run: python3 scripts/cursor_agent_proxy.py</div>
       </div>
       <div class="ai-btn-row">
         <button type="button" id="ai-settings-cancel">Cancel</button>
@@ -939,6 +1004,13 @@
     <button type="button" id="btn-crit-path">Show critical path</button>
   </div>
   <div id="perf-chart-tooltip" role="tooltip"></div>
+  <script src="insight-engine/feature-extractor.js"></script>
+  <script src="insight-engine/signal-computer.js"></script>
+  <script src="insight-engine/rule-engine.js"></script>
+  <script src="insight-engine/insight-aggregator.js"></script>
+  <script src="insight-engine/llm-explainer.js"></script>
+  <script src="insight-engine/ml-model.js"></script>
+  <script src="insight-engine/engine.js"></script>
   <script>
 (function () {
   const chartWrap = document.getElementById('chart-wrap');
@@ -1120,18 +1192,18 @@
   }
 
   function computeRunMetricsSummary(before, after, present) {
-    let speedupPct = null;
+    let speedupRatio = null;
     let speedupSource = '';
     const etB = before.execution_time;
     const etA = after.execution_time;
-    if (Number.isFinite(etB) && etB > 0 && Number.isFinite(etA)) {
-      speedupPct = ((etB - etA) / etB) * 100;
+    if (Number.isFinite(etB) && etB > 0 && Number.isFinite(etA) && etA > 0) {
+      speedupRatio = etB / etA;
       speedupSource = 'execution time';
     } else {
       const cB = before.cycles;
       const cA = after.cycles;
-      if (Number.isFinite(cB) && cB > 0 && Number.isFinite(cA)) {
-        speedupPct = ((cB - cA) / cB) * 100;
+      if (Number.isFinite(cB) && cB > 0 && Number.isFinite(cA) && cA > 0) {
+        speedupRatio = cB / cA;
         speedupSource = 'cycles';
       }
     }
@@ -1161,24 +1233,21 @@
       keyIssue = summaryPhrases(worst.def, false);
     }
 
-    return { speedupPct, speedupSource, keyImp, keyIssue };
+    return { speedupRatio, speedupSource, keyImp, keyIssue };
   }
 
   function renderRunMetricsSummaryEl(summary) {
     const el = document.getElementById('run-metrics-summary');
     if (!el) return;
     let speedupHtml = '<strong>—</strong>';
-    if (summary.speedupPct != null && Number.isFinite(summary.speedupPct)) {
-      const cls = summary.speedupPct >= 0 ? 'rms-pos' : 'rms-neg';
-      speedupHtml = `<strong class="${cls}">${summary.speedupPct.toFixed(1)}%</strong> <span class="rms-muted">(from ${summary.speedupSource})</span>`;
+    if (summary.speedupRatio != null && Number.isFinite(summary.speedupRatio)) {
+      const cls = summary.speedupRatio >= 1.0 ? 'rms-pos' : 'rms-neg';
+      speedupHtml = `<strong class="${cls}">${summary.speedupRatio.toFixed(2)}x</strong> <span class="rms-muted">(from ${summary.speedupSource})</span>`;
     }
-    const runsNote = dataRunMetrics && dataRunMetrics.runs
-      ? `<div class="rms-row rms-muted" style="font-size:.85em">Values averaged over ${dataRunMetrics.runs} runs</div>` : '';
     el.innerHTML = `
       <div class="rms-row">Speedup: ${speedupHtml}</div>
       <div class="rms-row">Key improvement: <strong>${escapeHtml(summary.keyImp)}</strong></div>
       <div class="rms-row">Potential issue: <strong>${escapeHtml(summary.keyIssue)}</strong></div>
-      ${runsNote}
     `;
   }
 
@@ -1317,7 +1386,8 @@
         .append('g')
         .attr('transform', `translate(${x0(def.key)},0)`);
       const hb = heights[def.key];
-      const colB = '#94a3b8';
+      const gpuMode = RUN_METRIC_DEFS === GPU_METRIC_DEFS;
+      const colB = gpuMode ? (dk ? '#7e6ca3' : '#a78bfa') : '#94a3b8';
       const colA = afterBarColor(def, hb.b, hb.a);
 
       let yLoc;
@@ -1344,16 +1414,19 @@
         const yTop = yLoc(row.h);
         const bh = ih - yTop;
         const xi = x1(row.side);
-        xg
+        const bar = xg
           .append('rect')
           .attr('x', xi)
-          .attr('y', yTop)
+          .attr('y', ih)
           .attr('width', bw)
-          .attr('height', Math.max(0, bh))
+          .attr('height', 0)
           .attr('fill', row.fill)
           .attr('rx', 3)
-          .style('cursor', 'crosshair')
-          .on('mousemove', (ev) => {
+          .style('cursor', 'crosshair');
+        bar.transition().duration(600).ease(d3.easeCubicOut)
+          .attr('y', yTop)
+          .attr('height', Math.max(0, bh));
+        bar.on('mousemove', (ev) => {
             const absB = formatRunMetricAbsolute(def, hb.b);
             const absA = formatRunMetricAbsolute(def, hb.a);
             const pc = pctChangeRaw(hb.b, hb.a);
@@ -1409,12 +1482,13 @@
       )
       .call((sel) => sel.select('.domain').remove())
       .selectAll('text')
-      .attr('fill', '#334155')
-      .attr('font-size', 11)
+      .attr('fill', dk ? '#cbd5e1' : '#334155')
+      .attr('font-size', 13)
+      .attr('font-weight', 500)
       .style('text-anchor', 'end')
       .attr('dx', '-0.3em')
       .attr('dy', '0.15em')
-      .attr('transform', 'rotate(-35)');
+      .attr('transform', 'rotate(-30)');
 
     g.append('line')
       .attr('x1', 0)
@@ -1448,11 +1522,15 @@
       return;
     }
     const heading = panel.querySelector('.run-metrics-heading');
+    const isGpu = dataRunMetrics.profiler === 'rocprof' || RUN_METRIC_DEFS === GPU_METRIC_DEFS;
+    panel.classList.toggle('gpu-mode', isGpu);
     if (heading) {
       const n = dataRunMetrics.runs;
-      const dev = dataRunMetrics.device ? ` · ${dataRunMetrics.device}` : '';
-      const prof = dataRunMetrics.profiler === 'rocprof' ? 'GPU ' : '';
-      heading.textContent = n ? `${prof}Benchmark comparison (avg of ${n} runs${dev})` : `${prof}Benchmark comparison${dev}`;
+      const tagClass = isGpu ? 'gpu' : 'cpu';
+      const tagLabel = isGpu ? 'GPU' : 'CPU';
+      const dev = dataRunMetrics.device ? ` \u00b7 ${dataRunMetrics.device}` : '';
+      const runsLabel = n ? ` (Average of ${n} runs)` : '';
+      heading.innerHTML = `<span class="run-metrics-profiler-tag ${tagClass}">${tagLabel}</span>Benchmark comparison${runsLabel}${dev ? `<span style="color:var(--muted);font-weight:400;font-size:11px">${dev}</span>` : ''}`;
     }
     renderRunMetricsChart();
     renderInsightsPanel();
@@ -2072,6 +2150,9 @@
       rows += `<div class="legend-row"><span class="legend-swatch legend-swatch-diff-new"></span><span>New</span></div>`;
     }
     rows += `<div class="legend-row"><span class="legend-swatch legend-swatch-backedge"></span><span>Back-edge (loop latch)</span></div>`;
+    if (showCriticalPath) {
+      rows += `<div class="legend-row"><span class="legend-swatch legend-swatch-critpath"></span><span>Critical path · number = impact score</span></div>`;
+    }
     rows += `<div class="legend-row"><span class="legend-swatch legend-swatch-anim"></span><span>Active step</span></div>`;
     return rows;
   }
@@ -2174,9 +2255,47 @@
         reason: 'Same loops, more blocks, fewer instructions — likely code motion' };
     }
 
-    if (loopsB.length === loopsA.length && nA === nB && iA === iB) {
-      return { type: 'Loop Rotation', confidence: 0.5,
-        reason: 'Same structure, possible header rotation' };
+    if (loopsB.length === loopsA.length && nA === nB) {
+      const nodesB = (fnB.cfg && fnB.cfg.nodes) || [];
+      const nodesA = (fnA.cfg && fnA.cfg.nodes) || [];
+      const edgesB = (fnB.cfg && fnB.cfg.edges) || [];
+      const edgesA = (fnA.cfg && fnA.cfg.edges) || [];
+
+      const labelsB = nodesB.map(n => n.label || n.id).sort().join(',');
+      const labelsA = nodesA.map(n => n.label || n.id).sort().join(',');
+      const edgeSigB = edgesB.map(e => (e.from || e.source) + '->' + (e.to || e.target)).sort().join(',');
+      const edgeSigA = edgesA.map(e => (e.from || e.source) + '->' + (e.to || e.target)).sort().join(',');
+
+      const costMapB = {};
+      nodesB.forEach(n => { costMapB[n.label || n.id] = n.cost || 0; });
+      const costMapA = {};
+      nodesA.forEach(n => { costMapA[n.label || n.id] = n.cost || 0; });
+      let costDiff = 0;
+      for (const lbl of Object.keys(costMapB)) {
+        if (costMapA[lbl] != null) costDiff += Math.abs((costMapB[lbl] || 0) - (costMapA[lbl] || 0));
+      }
+
+      if (costDiff > 0 && labelsB === labelsA) {
+        const loopBodyBlocks = new Set();
+        loopsB.forEach(l => (l.blocks || []).forEach(b => loopBodyBlocks.add(typeof b === 'string' ? b : b.name || b.id)));
+        let bodyLost = 0, outsideGained = 0;
+        for (const lbl of Object.keys(costMapB)) {
+          const diff = (costMapA[lbl] || 0) - (costMapB[lbl] || 0);
+          if (diff < 0 && loopBodyBlocks.has(lbl)) bodyLost += Math.abs(diff);
+          if (diff > 0 && !loopBodyBlocks.has(lbl)) outsideGained += diff;
+        }
+        if (bodyLost > 0) {
+          return { type: 'LICM (Loop-Invariant Code Motion)', confidence: 0.7,
+            reason: 'Loop body cost decreased — invariant instructions likely hoisted' };
+        }
+      }
+
+      if (labelsB !== labelsA || edgeSigB !== edgeSigA) {
+        return { type: 'Loop Rotation', confidence: 0.5,
+          reason: 'Same loop count with different block names or edges — possible header rotation' };
+      }
+
+      return null;
     }
 
     return null;
@@ -2982,10 +3101,11 @@
         else if (impactVal >= 1e3) tag = (impactVal / 1e3).toFixed(1) + 'k';
         else tag = String(impactVal);
         d3.select(this).append('text')
-          .attr('class', 'node-impact-badge')
-          .attr('text-anchor', 'middle')
-          .attr('y', d.h / 2 + 11)
-          .text('\u26a1 ' + tag);
+          .attr('class', 'node-impact-num')
+          .attr('text-anchor', 'end')
+          .attr('x', d.w / 2 - 2)
+          .attr('y', -d.h / 2 - 2)
+          .text(tag);
       });
     }
 
@@ -3603,35 +3723,29 @@
 
   function loadDataset(prefix) {
     const p = prefix ? prefix + '/' : '';
+    const nc = '?_t=' + Date.now();
     statusEl.textContent = 'Loading…';
     hideLoopDetail();
     Promise.all([
-      fetch(p + 'output.json').then((r) => (r.ok ? r.json() : null)),
-      fetch(p + 'before.json').then((r) => (r.ok ? r.json() : null)),
-      fetch(p + 'after.json').then((r) => (r.ok ? r.json() : null)),
-      fetch(p + 'perf.json').then((r) => (r.ok ? r.json() : null)),
-      fetch(p + 'perf_compare.json').then((r) => (r.ok ? r.json() : null)),
-      fetch(p + 'remarks.json').then((r) => (r.ok ? r.json() : null)),
+      fetch(p + 'before.json' + nc).then((r) => (r.ok ? r.json() : null)),
+      fetch(p + 'after.json' + nc).then((r) => (r.ok ? r.json() : null)),
+      fetch(p + 'perf_compare.json' + nc).then((r) => (r.ok ? r.json() : null)),
+      fetch(p + 'remarks.json' + nc).then((r) => (r.ok ? r.json() : null)),
     ])
-      .then(([out, bef, aft, perf, pcmp, rmk]) => {
-        dataOutput = out;
+      .then(([bef, aft, pcmp, rmk]) => {
+        dataOutput = null;
         dataBefore = bef;
         dataAfter = aft;
-        dataPerf = perf;
+        dataPerf = null;
         dataRemarks = rmk;
         const cmpOk = normalizeRunMetricsPayload(pcmp);
-        const runFromPerf =
-          perf && normalizeRunMetricsPayload(perf.run_metrics);
-        dataRunMetrics = cmpOk || runFromPerf || null;
+        dataRunMetrics = cmpOk || null;
         const parts = [];
-        if (out) parts.push('output.json');
         if (bef) parts.push('before.json');
         if (aft) parts.push('after.json');
-        if (perf) parts.push('perf.json');
         if (cmpOk) parts.push('perf_compare.json');
-        else if (runFromPerf) parts.push('perf.run_metrics');
         if (rmk) parts.push('remarks.json');
-        if (!out && !bef && !aft) {
+        if (!bef && !aft) {
           if (dataRunMetrics) {
             statusEl.textContent =
               'Loaded: ' + parts.join(', ') + ' (no CFG JSON)';
@@ -3677,15 +3791,28 @@
   const apikeyInput = document.getElementById('ai-apikey-input');
   const fieldEndpoint = document.getElementById('ai-field-endpoint');
   const fieldApikey = document.getElementById('ai-field-apikey');
+  const fieldCursor = document.getElementById('ai-field-cursor');
+  const fieldCursorRef = document.getElementById('ai-field-cursor-ref');
+  const fieldCursorProxy = document.getElementById('ai-field-cursor-proxy');
+  const cursorRepoInput = document.getElementById('ai-cursor-repo-input');
+  const cursorRefInput = document.getElementById('ai-cursor-ref-input');
+  const cursorProxyInput = document.getElementById('ai-cursor-proxy-input');
   const settingsOverlay = document.getElementById('ai-settings-overlay');
 
   function applyProviderUI() {
     const p = providerSelect.value;
+    const showCursor = p === 'cursor-cloud';
     fieldEndpoint.style.display = (p === 'ollama' || p === 'custom') ? '' : 'none';
     fieldApikey.style.display = (p === 'ollama' || p === 'none') ? 'none' : '';
+    fieldCursor.style.display = showCursor ? '' : 'none';
+    fieldCursorRef.style.display = showCursor ? '' : 'none';
+    fieldCursorProxy.style.display = showCursor ? '' : 'none';
     if (p === 'openai') modelInput.placeholder = 'gpt-4o';
     else if (p === 'anthropic') modelInput.placeholder = 'claude-sonnet-4-20250514';
-    else if (p === 'ollama') { modelInput.placeholder = 'llama3'; endpointInput.placeholder = 'http://localhost:11434/v1'; }
+    else if (p === 'cursor-cloud') {
+      modelInput.placeholder = 'optional — Cursor model id if your API supports it';
+      if (!cursorProxyInput.value.trim()) cursorProxyInput.placeholder = 'http://127.0.0.1:8787';
+    } else if (p === 'ollama') { modelInput.placeholder = 'llama3'; endpointInput.placeholder = 'http://localhost:11434/v1'; }
     else if (p === 'custom') { modelInput.placeholder = 'model-name'; endpointInput.placeholder = 'https://api.example.com/v1'; }
   }
   providerSelect.addEventListener('change', applyProviderUI);
@@ -3696,6 +3823,9 @@
     if (s.model) modelInput.value = s.model;
     if (s.endpoint) endpointInput.value = s.endpoint;
     if (s.apikey) apikeyInput.value = s.apikey;
+    if (s.cursorRepo) cursorRepoInput.value = s.cursorRepo;
+    if (s.cursorRef) cursorRefInput.value = s.cursorRef;
+    if (s.cursorProxyBase) cursorProxyInput.value = s.cursorProxyBase;
     applyProviderUI();
   })();
 
@@ -3713,7 +3843,10 @@
       provider: providerSelect.value,
       model: modelInput.value.trim(),
       endpoint: endpointInput.value.trim(),
-      apikey: apikeyInput.value.trim()
+      apikey: apikeyInput.value.trim(),
+      cursorRepo: cursorRepoInput.value.trim(),
+      cursorRef: cursorRefInput.value.trim(),
+      cursorProxyBase: cursorProxyInput.value.trim()
     });
     settingsOverlay.classList.remove('open');
   });
@@ -3722,8 +3855,11 @@
     const s = loadAISettings();
     const p = s.provider || 'none';
     if (p === 'none') return null;
-    const needsKey = (p === 'openai' || p === 'anthropic');
+    const needsKey = (p === 'openai' || p === 'anthropic' || p === 'cursor-cloud');
     if (needsKey && !s.apikey) return { error: 'API key required for ' + p + '. Click ⚙ AI to configure.' };
+    if (p === 'cursor-cloud' && !(s.cursorRepo || '').trim()) {
+      return { error: 'Cursor Cloud requires a GitHub repository URL. Click ⚙ AI to configure.' };
+    }
     let endpoint, headers, model;
     model = s.model || '';
     if (p === 'openai') {
@@ -3734,6 +3870,13 @@
       endpoint = 'https://api.anthropic.com/v1/messages';
       headers = { 'Content-Type': 'application/json', 'x-api-key': s.apikey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
       if (!model) model = 'claude-sonnet-4-20250514';
+    } else if (p === 'cursor-cloud') {
+      const base = (s.cursorProxyBase || 'http://127.0.0.1:8787').replace(/\/+$/, '');
+      endpoint = base + '/v1/chat/completions';
+      headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + s.apikey
+      };
     } else if (p === 'ollama') {
       const base = s.endpoint || 'http://localhost:11434/v1';
       endpoint = base.replace(/\/+$/, '') + '/chat/completions';
@@ -3746,7 +3889,12 @@
       if (s.apikey) headers['Authorization'] = 'Bearer ' + s.apikey;
       if (!model) model = 'default';
     }
-    return { provider: p, endpoint, headers, model };
+    const cfg = { provider: p, endpoint, headers, model };
+    if (p === 'cursor-cloud') {
+      cfg.cursorRepo = (s.cursorRepo || '').trim();
+      cfg.cursorRef = (s.cursorRef || 'main').trim();
+    }
+    return cfg;
   }
 
   function buildTransformContext() {
@@ -3837,7 +3985,12 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
         return j.content[0].text;
       };
     } else {
-      body = JSON.stringify({ model: cfg.model, messages, temperature: 0.3, max_tokens: 2048 });
+      const chatBody = { model: cfg.model, messages, temperature: 0.3, max_tokens: 2048 };
+      if (cfg.provider === 'cursor-cloud') {
+        chatBody._cursor_repository = cfg.cursorRepo;
+        chatBody._cursor_ref = cfg.cursorRef || 'main';
+      }
+      body = JSON.stringify(chatBody);
       parseResponse = async (resp) => {
         const j = await resp.json();
         if (j.error) throw new Error(j.error.message || JSON.stringify(j.error));
@@ -3855,7 +4008,11 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
       return await parseResponse(resp);
     } catch (err) {
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-        throw new Error('Network error — check your API endpoint, CORS settings, and that the service is running. For Ollama, ensure it is started with OLLAMA_ORIGINS=* to allow browser requests.');
+        let extra = ' For Ollama, ensure it is started with OLLAMA_ORIGINS=* to allow browser requests.';
+        if (cfg.provider === 'cursor-cloud') {
+          extra = ' For Cursor Cloud, run: python3 scripts/cursor_agent_proxy.py (default port 8787) and set the proxy URL in ⚙ AI.';
+        }
+        throw new Error('Network error — check your API endpoint, CORS settings, and that the service is running.' + extra);
       }
       throw err;
     }
@@ -3870,170 +4027,62 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
     aiInsightsPanel.classList.toggle('visible');
   });
 
-  function generateStaticInsights(ctx) {
-    const result = { improved: [], regressed: [], suggestions: [], applications: [] };
-    const pb = ctx.perf && ctx.perf.before;
-    const pa = ctx.perf && ctx.perf.after;
+  /* ── Insight Engine bridge ── */
 
-    if (pb && pa) {
-      if (pa.execution_time && pb.execution_time) {
-        const pct = ((pb.execution_time - pa.execution_time) / pb.execution_time * 100);
-        if (pct > 1) result.improved.push('Execution time reduced by ' + pct.toFixed(1) + '% (' + pb.execution_time + ' ms \u2192 ' + pa.execution_time + ' ms)');
-        else if (pct < -1) result.regressed.push('Execution time increased by ' + Math.abs(pct).toFixed(1) + '% (' + pb.execution_time + ' ms \u2192 ' + pa.execution_time + ' ms)');
-      }
-      if (pa.cycles && pb.cycles) {
-        const pct = ((pb.cycles - pa.cycles) / pb.cycles * 100);
-        if (pct > 1) result.improved.push('CPU cycles reduced by ' + pct.toFixed(1) + '% (' + pb.cycles.toLocaleString() + ' \u2192 ' + pa.cycles.toLocaleString() + ')');
-        else if (pct < -1) result.regressed.push('CPU cycles increased by ' + Math.abs(pct).toFixed(1) + '%');
-      }
-      if (pa.ipc && pb.ipc) {
-        const diff = pa.ipc - pb.ipc;
-        if (diff > 0.05) result.improved.push('IPC improved from ' + pb.ipc + ' to ' + pa.ipc + ' \u2014 better instruction-level parallelism');
-        else if (diff < -0.05) result.regressed.push('IPC dropped from ' + pb.ipc + ' to ' + pa.ipc + ' \u2014 more pipeline stalls');
-      }
-      if (pb.l1_miss_rate != null && pa.l1_miss_rate != null) {
-        const diff = pb.l1_miss_rate - pa.l1_miss_rate;
-        if (diff > 0.5) result.improved.push('L1 cache miss rate reduced by ' + diff.toFixed(1) + ' percentage points (' + pb.l1_miss_rate + '% \u2192 ' + pa.l1_miss_rate + '%)');
-        else if (diff < -0.5) result.regressed.push('L1 cache miss rate increased by ' + Math.abs(diff).toFixed(1) + ' pp');
-      }
-      if (pb.llc_miss_rate != null && pa.llc_miss_rate != null) {
-        const diff = pb.llc_miss_rate - pa.llc_miss_rate;
-        if (diff > 0.1) result.improved.push('LLC miss rate reduced (' + pb.llc_miss_rate + '% \u2192 ' + pa.llc_miss_rate + '%)');
-        else if (diff < -0.1) result.regressed.push('LLC miss rate increased (' + pb.llc_miss_rate + '% \u2192 ' + pa.llc_miss_rate + '%)');
-      }
-      if (pb.branch_miss_rate != null && pa.branch_miss_rate != null) {
-        const diff = pb.branch_miss_rate - pa.branch_miss_rate;
-        if (diff > 0.05) result.improved.push('Branch miss rate reduced (' + pb.branch_miss_rate + '% \u2192 ' + pa.branch_miss_rate + '%)');
-        else if (diff < -0.05) result.regressed.push('Branch miss rate increased (' + pb.branch_miss_rate + '% \u2192 ' + pa.branch_miss_rate + '%)');
-      }
-      if (pa.instructions && pb.instructions) {
-        const pct = ((pa.instructions - pb.instructions) / pb.instructions * 100);
-        if (pct > 5) result.regressed.push('Total instructions increased by ' + pct.toFixed(1) + '% \u2014 code size overhead from transformation');
-        else if (pct < -5) result.improved.push('Total instructions reduced by ' + Math.abs(pct).toFixed(1) + '%');
-      }
-
-      // --- GPU-specific metrics ---
-      if (pa.valu_insts && pb.valu_insts) {
-        const pct = ((pb.valu_insts - pa.valu_insts) / pb.valu_insts * 100);
-        if (pct > 2) result.improved.push('VALU instructions reduced by ' + pct.toFixed(1) + '% (' + pb.valu_insts.toLocaleString() + ' \u2192 ' + pa.valu_insts.toLocaleString() + ') \u2014 less ALU work per wavefront');
-        else if (pct < -2) result.regressed.push('VALU instructions increased by ' + Math.abs(pct).toFixed(1) + '% \u2014 transformation added arithmetic overhead');
-      }
-      if (pa.vmem_insts && pb.vmem_insts) {
-        const pct = ((pb.vmem_insts - pa.vmem_insts) / pb.vmem_insts * 100);
-        if (pct > 2) result.improved.push('VMEM (global memory) instructions reduced by ' + pct.toFixed(1) + '% \u2014 fewer expensive global memory accesses');
-        else if (pct < -2) result.regressed.push('VMEM instructions increased by ' + Math.abs(pct).toFixed(1) + '% \u2014 more global memory traffic');
-      }
-      if (pa.smem_insts && pb.smem_insts) {
-        const pct = ((pb.smem_insts - pa.smem_insts) / pb.smem_insts * 100);
-        if (pct > 5) result.improved.push('SMEM (scalar memory) instructions reduced by ' + pct.toFixed(1) + '%');
-        else if (pct < -5) result.regressed.push('SMEM instructions increased by ' + Math.abs(pct).toFixed(1) + '%');
-      }
-      if (pa.lds_insts && pb.lds_insts) {
-        const pct = ((pa.lds_insts - pb.lds_insts) / pb.lds_insts * 100);
-        if (pct > 10) result.improved.push('LDS (shared memory) usage increased by ' + pct.toFixed(1) + '% \u2014 more data kept in fast on-chip memory (positive for tiling)');
-        else if (pct < -10) result.regressed.push('LDS usage decreased by ' + Math.abs(pct).toFixed(1) + '% \u2014 less on-chip data reuse');
-      }
-      if (pb.l2_hit_rate != null && pa.l2_hit_rate != null) {
-        const l2b = pb.l2_hit_rate > 1 ? pb.l2_hit_rate : pb.l2_hit_rate * 100;
-        const l2a = pa.l2_hit_rate > 1 ? pa.l2_hit_rate : pa.l2_hit_rate * 100;
-        const diff = l2a - l2b;
-        if (diff > 1) result.improved.push('GPU L2 cache hit rate improved by ' + diff.toFixed(1) + ' pp (' + l2b.toFixed(1) + '% \u2192 ' + l2a.toFixed(1) + '%) \u2014 better data locality');
-        else if (diff < -1) result.regressed.push('GPU L2 hit rate dropped by ' + Math.abs(diff).toFixed(1) + ' pp (' + l2b.toFixed(1) + '% \u2192 ' + l2a.toFixed(1) + '%) \u2014 working set exceeds L2 capacity or access pattern is non-coalesced');
-      }
-      if (pa.waves && pb.waves) {
-        const diff = pa.waves - pb.waves;
-        if (diff > pb.waves * 0.05) result.improved.push('Wavefront count increased (' + pb.waves + ' \u2192 ' + pa.waves + ') \u2014 higher GPU occupancy');
-        else if (diff < -(pb.waves * 0.05)) result.regressed.push('Wavefront count decreased (' + pb.waves + ' \u2192 ' + pa.waves + ') \u2014 lower occupancy, possibly due to higher register pressure from unrolling');
-      }
-      if (pa.l1_to_l2_traffic && pb.l1_to_l2_traffic) {
-        const pct = ((pb.l1_to_l2_traffic - pa.l1_to_l2_traffic) / pb.l1_to_l2_traffic * 100);
-        if (pct > 5) result.improved.push('L1\u2192L2 traffic reduced by ' + pct.toFixed(1) + '% \u2014 better data reuse in L1/LDS');
-        else if (pct < -5) result.regressed.push('L1\u2192L2 traffic increased by ' + Math.abs(pct).toFixed(1) + '% \u2014 more cache-line fetches needed');
-      }
-    }
-
-    const bLoops = ctx.before && ctx.before.loops || [];
-    const aLoops = ctx.after && ctx.after.loops || [];
-    const tName = (ctx.transform_name || '').toLowerCase();
-
-    if (tName.includes('tiling') || tName.includes('tile')) {
-      result.suggestions.push('Experiment with different tile sizes \u2014 optimal size depends on L1 cache line size and associativity of the target CPU.');
-      result.applications.push('Matrix multiplication, stencil computations, image convolution \u2014 any nested loop with reuse across iterations.');
-    }
-    if (tName.includes('unroll')) {
-      result.suggestions.push('Check if the unroll factor matches the target\u2019s functional unit count. Over-unrolling increases register pressure.');
-      result.applications.push('Tight arithmetic loops (dot products, reductions) where loop overhead dominates.');
-    }
-    if (tName.includes('interchange')) {
-      result.suggestions.push('Verify that the interchanged loop order matches the array storage layout (row-major for C/C++).');
-      result.applications.push('Column-wise traversals of row-major arrays, matrix transpose, any loop nest with non-unit stride on the innermost dimension.');
-    }
-    if (tName.includes('fusion') || tName.includes('fuse')) {
-      result.suggestions.push('Ensure fused loops don\u2019t exceed register file capacity \u2014 excessive fusion can cause spills.');
-      result.applications.push('Producer-consumer loop pairs (e.g., compute + normalize), stream processing pipelines.');
-    }
-    if (tName.includes('licm') || tName.includes('invariant')) {
-      result.suggestions.push('Check for remaining invariant computations that weren\u2019t hoisted \u2014 they may need explicit -reassociate or -gvn passes first.');
-      result.applications.push('Loops with repeated loads from global/const memory, redundant address calculations, or invariant function calls.');
-    }
-
-    if (bLoops.length > 0 && aLoops.length > 0) {
-      const bDeps = bLoops.flatMap(l => l.dependencies || []);
-      const aDeps = aLoops.flatMap(l => l.dependencies || []);
-      if (bDeps.length > aDeps.length)
-        result.improved.push('Dependencies reduced from ' + bDeps.length + ' to ' + aDeps.length + ' \u2014 more parallelism available.');
-      const bMem = bLoops.flatMap(l => l.memory_accesses || []);
-      const aMem = aLoops.flatMap(l => l.memory_accesses || []);
-      const bSeq = bMem.filter(m => m.pattern === 'stride-1').length;
-      const aSeq = aMem.filter(m => m.pattern === 'stride-1').length;
-      if (aSeq > bSeq)
-        result.improved.push('More sequential (stride-1) memory accesses after transform (' + bSeq + ' \u2192 ' + aSeq + ') \u2014 better spatial locality / GPU coalescing.');
-      else if (aSeq < bSeq)
-        result.regressed.push('Sequential (stride-1) accesses reduced from ' + bSeq + ' to ' + aSeq + ' \u2014 potential loss of memory coalescing on GPU.');
-      const bStrided = bMem.filter(m => m.pattern === 'strided').length;
-      const aStrided = aMem.filter(m => m.pattern === 'strided').length;
-      if (aStrided > bStrided)
-        result.regressed.push('Strided (non-unit-stride) accesses increased (' + bStrided + ' \u2192 ' + aStrided + ') \u2014 non-coalesced GPU memory access.');
-    }
-
-    const isGpuCtx = pb && (pb.valu_insts || pb.kernel_time_ns || pb.waves);
-    if (isGpuCtx) {
-      if (tName.includes('tiling') || tName.includes('tile'))
-        result.suggestions.push('For GPU: tile sizes should map to workgroup dimensions (e.g. 16\u00d716 = 256 threads). Use LDS (shared memory) for the tile buffer.');
-      if (tName.includes('unroll'))
-        result.suggestions.push('For GPU: over-unrolling increases register pressure, reducing occupancy (fewer wavefronts). Check VGPR usage with rocprof --stats.');
-      if (tName.includes('interchange'))
-        result.suggestions.push('For GPU: the innermost loop index should map to threadIdx.x / work-item ID for coalesced global memory access (stride-1 across threads).');
-      if (tName.includes('fusion') || tName.includes('fuse'))
-        result.suggestions.push('For GPU: fused kernels reduce launch overhead but may increase register pressure \u2014 check occupancy.');
-      if (tName.includes('licm') || tName.includes('invariant'))
-        result.suggestions.push('For GPU: hoisting invariant loads from VMEM (global) is critical \u2014 each saved VMEM instruction avoids 200\u2013400 cycle latency.');
-      result.applications.push('GPU loop transforms benefit most when they improve memory coalescing (stride-1 access) and data reuse in LDS/L1.');
-    }
-
-    if (!result.suggestions.length)
-      result.suggestions.push('Run with different optimization levels (-O2 vs -O3) to compare transformation effectiveness.');
-
-    return result;
+  function runInsightEngine() {
+    if (typeof InsightEngine === 'undefined' || !InsightEngine.analyze) return null;
+    try {
+      return InsightEngine.analyze(dataBefore || {}, dataAfter || {}, dataRunMetrics || null);
+    } catch (e) { console.warn('[InsightEngine]', e); return null; }
   }
 
-  function renderInsightResult(parsed) {
+  var _lastEngineReport = null;
+
+  function renderEngineReport(report) {
     let html = '';
-    const sections = [
-      { key: 'improved', cls: 'improved', title: 'What Improved' },
-      { key: 'regressed', cls: 'regressed', title: 'What Regressed' },
-      { key: 'suggestions', cls: 'suggestions', title: 'Suggestions' },
-      { key: 'applications', cls: 'applications', title: 'Applications' }
-    ];
-    sections.forEach(s => {
-      const items = parsed[s.key];
-      if (items && items.length) {
-        html += '<div class="ai-insight-section ' + s.cls + '">';
-        html += '<h5>' + s.title + '</h5><ul>';
-        items.forEach(i => { html += '<li>' + i + '</li>'; });
-        html += '</ul></div>';
-      }
+    html += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">';
+    html += '<span class="insight-badge behaviour-' + report.behaviour + '">' + report.behaviour + '</span>';
+    html += '<span class="insight-badge bottleneck">' + report.bottleneck.class + '</span>';
+    html += '<span class="insight-badge confidence">conf ' + report.overall_confidence + '</span>';
+    html += '</div>';
+
+    const sigKeys = Object.keys(report.signals.delta);
+    html += '<details class="signal-details"><summary>Signal deltas (' + sigKeys.length + ' signals)</summary>';
+    html += '<table class="signal-table"><tr><th>Signal</th><th>Before</th><th>After</th><th>Δ</th></tr>';
+    sigKeys.forEach(function(k) {
+      const d = report.signals.delta[k];
+      const arrow = d > 0.02 ? '▲' : d < -0.02 ? '▼' : '─';
+      const cls = d > 0.02 ? 'sig-up' : d < -0.02 ? 'sig-down' : 'sig-flat';
+      html += '<tr class="' + cls + '"><td>' + k.replace(/_/g, ' ') + '</td>';
+      html += '<td>' + report.signals.before[k].toFixed(3) + '</td>';
+      html += '<td>' + report.signals.after[k].toFixed(3) + '</td>';
+      html += '<td>' + arrow + ' ' + (d > 0 ? '+' : '') + d.toFixed(3) + '</td></tr>';
     });
+    html += '</table></details>';
+
+    function insightLI(ins) {
+      return '<li><strong>[' + ins.impact + ', conf ' + ins.confidence + ']</strong> ' + ins.summary + '</li>';
+    }
+    if (report.improved.length) {
+      html += '<div class="ai-insight-section improved"><h5>What Improved (' + report.improved.length + ')</h5><ul>';
+      report.improved.forEach(function(i) { html += insightLI(i); });
+      html += '</ul></div>';
+    }
+    if (report.regressed.length) {
+      html += '<div class="ai-insight-section regressed"><h5>What Regressed (' + report.regressed.length + ')</h5><ul>';
+      report.regressed.forEach(function(i) { html += insightLI(i); });
+      html += '</ul></div>';
+    }
+    if (report.expected && report.expected.length) {
+      html += '<div class="ai-insight-section expectations"><h5>Pre-existing Expectations</h5><ul>';
+      report.expected.forEach(function(e) { html += '<li>' + e + '</li>'; });
+      html += '</ul></div>';
+    }
+    if (report.suggestions && report.suggestions.length) {
+      html += '<div class="ai-insight-section suggestions"><h5>Suggestions</h5><ul>';
+      report.suggestions.forEach(function(s) { html += '<li>' + s + '</li>'; });
+      html += '</ul></div>';
+    }
     return html || '<div style="color:var(--muted);">No insights to show.</div>';
   }
 
@@ -4045,28 +4094,33 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
     btnGenInsights.disabled = true;
     aiInsightsPanel.classList.add('visible');
 
-    if (useAI) {
-      aiInsightsContent.innerHTML = '<div class="ai-loading"><div class="spinner"></div>Analyzing with ' + cfg.model + '...</div>';
+    _lastEngineReport = runInsightEngine();
+
+    if (useAI && _lastEngineReport) {
+      const aiLabel = cfg.provider === 'cursor-cloud' ? 'Cursor Cloud Agent (async; may take minutes)' : (cfg.model || 'AI');
+      aiInsightsContent.innerHTML = '<div class="ai-loading"><div class="spinner"></div>Analyzing with ' + aiLabel + '...</div>';
       try {
-        const prompt = buildInsightsPrompt(ctx);
-        const raw = await callAI([
-          { role: 'system', content: 'You are a compiler optimization expert. Respond only with valid JSON.' },
-          { role: 'user', content: prompt }
-        ]);
-        let parsed;
-        try {
-          const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          parsed = JSON.parse(jsonStr);
-        } catch { parsed = { improved: [raw], regressed: [], suggestions: [], applications: [] }; }
-        aiInsightsContent.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Generated by ' + cfg.model + '</div>' + renderInsightResult(parsed);
+        const messages = [
+          { role: 'system', content: InsightEngine.LLMExplainer.buildSystemPrompt() },
+          { role: 'user', content: InsightEngine.LLMExplainer.buildUserPrompt(_lastEngineReport) }
+        ];
+        const raw = await callAI(messages);
+        const genBy = cfg.provider === 'cursor-cloud' ? 'Cursor Cloud Agent' : (cfg.model || 'AI');
+        aiInsightsContent.innerHTML =
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Generated by ' + genBy + ' (Phase 2 — LLM explanation of rule-based analysis)</div>' +
+          '<div style="white-space:pre-wrap;font-size:13px;line-height:1.6;margin-bottom:12px;">' + raw.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
+          '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--muted);">Underlying deterministic analysis (Phase 1)</summary>' +
+          renderEngineReport(_lastEngineReport) + '</details>';
       } catch (err) {
         aiInsightsContent.innerHTML = '<div style="color:#dc2626;font-size:13px;margin-bottom:8px;">AI failed: ' + err.message + '</div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Falling back to rule-based analysis:</div>' +
-          renderInsightResult(generateStaticInsights(ctx));
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Deterministic rule-based analysis (Phase 1):</div>' +
+          renderEngineReport(_lastEngineReport);
       }
+    } else if (_lastEngineReport) {
+      aiInsightsContent.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Deterministic rule-based analysis (configure \u2699 AI for LLM explanations)</div>' +
+        renderEngineReport(_lastEngineReport);
     } else {
-      aiInsightsContent.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Rule-based analysis (configure ⚙ AI for richer insights)</div>' +
-        renderInsightResult(generateStaticInsights(ctx));
+      aiInsightsContent.innerHTML = '<div style="color:var(--muted);">No data loaded to analyze.</div>';
     }
     btnGenInsights.disabled = false;
   });
@@ -4086,7 +4140,9 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
       const hasAI = provCfg && !provCfg.error;
       const sysMsg = `You are a compiler optimization assistant embedded in a loop transformation visualizer. You have access to the following data about the current visualization:\n\n${JSON.stringify(ctx, null, 2)}\n\nAnswer questions about this transformation, its performance impact, CFG structure, and suggest optimizations. Be concise and reference specific data. If the user asks about something not in the data, say so.`;
       chatHistory = [{ role: 'system', content: sysMsg }];
-      const mode = hasAI ? 'AI-powered (' + provCfg.model + ')' : 'rule-based (configure ⚙ AI for richer answers)';
+      const mode = hasAI
+        ? (provCfg.provider === 'cursor-cloud' ? 'Cursor Cloud Agents (slow per message)' : 'AI-powered (' + (provCfg.model || 'model') + ')')
+        : 'rule-based (configure ⚙ AI for richer answers)';
       addChatMessage('system', 'Connected (' + mode + '). Ask about this ' + (ctx.transform_name || 'transformation') + '.');
     }
     chatInput.focus();
@@ -4112,18 +4168,25 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
 
     const cfg = getProviderConfig();
     if (!cfg || cfg.error) {
+      const rpt = _lastEngineReport || runInsightEngine();
       const ctx = buildTransformContext();
       const q = text.toLowerCase();
       let reply = '';
-      if (q.includes('improv') || q.includes('better') || q.includes('help')) {
-        const ins = generateStaticInsights(ctx);
-        reply = ins.improved.length ? 'Improvements:\n' + ins.improved.map(i => '• ' + i).join('\n') : 'No clear improvements detected from the available data.';
-      } else if (q.includes('regress') || q.includes('worse') || q.includes('hurt')) {
-        const ins = generateStaticInsights(ctx);
-        reply = ins.regressed.length ? 'Regressions:\n' + ins.regressed.map(i => '• ' + i).join('\n') : 'No regressions detected.';
-      } else if (q.includes('suggest') || q.includes('recommend') || q.includes('next')) {
-        const ins = generateStaticInsights(ctx);
-        reply = ins.suggestions.map(i => '• ' + i).join('\n');
+      if (rpt && (q.includes('improv') || q.includes('better') || q.includes('help'))) {
+        reply = rpt.improved.length ? 'Improvements:\n' + rpt.improved.map(i => '• ' + i.summary).join('\n') : 'No clear improvements detected from the available data.';
+      } else if (rpt && (q.includes('regress') || q.includes('worse') || q.includes('hurt'))) {
+        reply = rpt.regressed.length ? 'Regressions:\n' + rpt.regressed.map(i => '• ' + i.summary).join('\n') : 'No regressions detected.';
+      } else if (rpt && (q.includes('suggest') || q.includes('recommend') || q.includes('next'))) {
+        reply = rpt.suggestions.map(i => '• ' + i).join('\n');
+      } else if (rpt && (q.includes('signal') || q.includes('score'))) {
+        reply = 'Signal deltas (after − before):\n';
+        Object.keys(rpt.signals.delta).forEach(function(k) {
+          var d = rpt.signals.delta[k];
+          reply += '  ' + k + ': ' + (d > 0 ? '+' : '') + d.toFixed(3) + '\n';
+        });
+        reply += '\nBottleneck: ' + rpt.bottleneck.class + ' (' + rpt.bottleneck.score + ')';
+      } else if (q.includes('bottleneck') || q.includes('bound')) {
+        reply = rpt ? 'Bottleneck: ' + rpt.bottleneck.class + ' (score ' + rpt.bottleneck.score + ')' : 'No analysis data available.';
       } else if (q.includes('transform') || q.includes('what') || q.includes('type')) {
         reply = 'Detected: ' + (ctx.transform_name || 'unknown') + '.';
         if (ctx.detected_transform) reply += '\nConfidence: ' + (ctx.detected_transform.confidence * 100).toFixed(0) + '%.\nReason: ' + ctx.detected_transform.reason;
@@ -4133,8 +4196,10 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
       } else if (q.includes('loop') || q.includes('dep') || q.includes('mem')) {
         const loops = (ctx.after || ctx.before || {}).loops || [];
         reply = loops.length ? loops.map(l => 'Loop "' + l.header + '" depth ' + l.depth + ', trip=' + l.trip_count + ', deps=' + (l.dependencies || []).length + ', mem_accesses=' + (l.memory_accesses || []).length).join('\n') : 'No loop data available.';
+      } else if (rpt) {
+        reply = InsightEngine.LLMExplainer.explainOffline(rpt);
       } else {
-        reply = 'I can answer questions about improvements, regressions, suggestions, transform type, performance, and loop details.\n\nFor richer conversational answers, configure an AI provider via ⚙ AI (e.g., Ollama for free local inference).';
+        reply = 'I can answer questions about improvements, regressions, suggestions, signals, bottleneck, transform type, performance, and loop details.\n\nFor richer conversational answers, configure an AI provider via ⚙ AI.';
       }
       chatHistory.push({ role: 'assistant', content: reply });
       addChatMessage('assistant', reply);
@@ -4156,25 +4221,9 @@ Be specific — reference actual numbers from the data. Keep each item to 1-2 se
       addChatMessage('assistant', reply);
     } catch (err) {
       thinkingDiv.remove();
-      addChatMessage('system', 'AI unavailable (' + err.message.split(':')[0] + '). Falling back to rule-based answers.');
-      const ctx = buildTransformContext();
-      const q = text.toLowerCase();
-      let reply = '';
-      if (q.includes('improv') || q.includes('better')) {
-        const ins = generateStaticInsights(ctx);
-        reply = ins.improved.length ? ins.improved.map(i => '\u2022 ' + i).join('\n') : 'No improvements detected in available data.';
-      } else if (q.includes('regress') || q.includes('worse')) {
-        const ins = generateStaticInsights(ctx);
-        reply = ins.regressed.length ? ins.regressed.map(i => '\u2022 ' + i).join('\n') : 'No regressions detected.';
-      } else if (q.includes('suggest')) {
-        reply = generateStaticInsights(ctx).suggestions.map(i => '\u2022 ' + i).join('\n');
-      } else {
-        const ins = generateStaticInsights(ctx);
-        reply = 'Here is what I can tell from the data:\n\n';
-        if (ins.improved.length) reply += 'Improved:\n' + ins.improved.map(i => '\u2022 ' + i).join('\n') + '\n\n';
-        if (ins.regressed.length) reply += 'Regressed:\n' + ins.regressed.map(i => '\u2022 ' + i).join('\n') + '\n\n';
-        reply += 'Suggestions:\n' + ins.suggestions.map(i => '\u2022 ' + i).join('\n');
-      }
+      addChatMessage('system', 'AI unavailable (' + err.message.split(':')[0] + '). Falling back to rule-based engine.');
+      const rpt = _lastEngineReport || runInsightEngine();
+      let reply = rpt ? InsightEngine.LLMExplainer.explainOffline(rpt) : 'No data loaded for analysis.';
       chatHistory.push({ role: 'assistant', content: reply });
       addChatMessage('assistant', reply);
     }

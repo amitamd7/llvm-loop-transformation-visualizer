@@ -2,7 +2,7 @@
 
 A survey of existing compiler visualization tools and how this tool differs.
 
-**Offline vs. AI in this tool:** CFGs, loop analysis, instruction mix, memory-access patterns, dependencies, `perf_compare.json` charts, auto-detected transform labels, and **rule-based** insights/chat all run in the browser without any LLM. **AI** (OpenAI, Anthropic, Ollama, or a custom OpenAI-compatible endpoint) is optional and only upgrades the ✨ Insights and 💬 Chat panels; see **FEATURES.md** for the full offline table and step-by-step AI setup.
+**Offline vs. AI in this tool:** CFGs, loop analysis, instruction mix, memory-access patterns, dependencies, `perf_compare.json` charts (from real `perf`/`rocprof` runs when you use the shipped scripts), auto-detected transform labels, and **rule-based** insights/chat all work without any LLM. **AI** (OpenAI, Anthropic, Ollama, custom endpoint, or **Cursor Cloud Agents** via `scripts/cursor_agent_proxy.py`) is optional and only upgrades the ✨ Insights and 💬 Chat panels; see **README.md** / **FEATURES.md** for setup.
 
 ---
 

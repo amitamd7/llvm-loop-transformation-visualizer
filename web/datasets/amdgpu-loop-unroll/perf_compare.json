@@ -1,0 +1,13 @@
+{
+  "runs": 5,
+  "device": "gfx90a",
+  "profiler": "rocprof",
+  "before": {
+    "kernel_time_ns": 0.0,
+    "execution_time": 0.0
+  },
+  "after": {
+    "kernel_time_ns": 0.0,
+    "execution_time": 0.0
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "runs": 5,
+  "before": {
+    "execution_time": 0.56,
+    "cycles": 1527173,
+    "instructions": 1275894,
+    "ipc": 0.84,
+    "l1_miss_rate": 23.87
+  },
+  "after": {
+    "execution_time": 0.48,
+    "cycles": 1577491,
+    "instructions": 1324373,
+    "ipc": 0.84,
+    "l1_miss_rate": 25.48
+  }
+}

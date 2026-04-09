@@ -1,0 +1,41 @@
+{
+  "transform": "Loop Tiling",
+  "source_file": "tile_demo.c",
+  "functions": [
+    {
+      "cfg": {
+        "edges": [
+          { "from": "b0", "to": "b1" },
+          { "from": "b1", "to": "b3" },
+          { "from": "b1", "to": "b2" },
+          { "from": "b2", "to": "b1" }
+        ],
+        "nodes": [
+          { "id": "b0", "label": "entry", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 1, "other": 1 } },
+          { "id": "b1", "label": "loop", "instructions": { "total": 3, "arith": 1, "memory": 0, "branch": 2, "other": 0 } },
+          { "id": "b2", "label": "body", "instructions": { "total": 4, "arith": 1, "memory": 2, "branch": 1, "other": 0 } },
+          { "id": "b3", "label": "exit", "instructions": { "total": 2, "arith": 0, "memory": 0, "branch": 0, "other": 2 } }
+        ]
+      },
+      "instruction_count": 11,
+      "loops": [
+        {
+          "blocks": ["loop", "body"],
+          "depth": 1,
+          "header": "loop",
+          "id": "tile_demo::loop::0",
+          "induction_variable": "i",
+          "memory_accesses": [
+            { "array": "A", "pattern": "stride-1", "type": "load" },
+            { "array": "A", "pattern": "stride-1", "type": "store" }
+          ],
+          "trip_count": "(1 + (zext i32 (0 smax %N) to i33))<nuw><nsw>",
+          "dependencies": [
+            { "type": "output", "from_var": "A[i]", "to_var": "A[i]", "distance": 0, "description": "Write-after-write on A[i] within same iteration" }
+          ]
+        }
+      ],
+      "name": "tile_demo"
+    }
+  ]
+}

@@ -1,0 +1,824 @@
+{
+  "functions": [
+    {
+      "cfg": {
+        "edges": [
+          {
+            "from": "b0",
+            "to": "b7"
+          },
+          {
+            "from": "b0",
+            "to": "b1"
+          },
+          {
+            "from": "b1",
+            "to": "b2"
+          },
+          {
+            "from": "b1",
+            "to": "b1"
+          },
+          {
+            "from": "b2",
+            "to": "b4"
+          },
+          {
+            "from": "b3",
+            "to": "b7"
+          },
+          {
+            "from": "b4",
+            "to": "b6"
+          },
+          {
+            "from": "b4",
+            "to": "b5"
+          },
+          {
+            "from": "b5",
+            "to": "b6"
+          },
+          {
+            "from": "b6",
+            "to": "b3"
+          },
+          {
+            "from": "b6",
+            "to": "b4"
+          }
+        ],
+        "nodes": [
+          {
+            "cost": 10,
+            "id": "b0",
+            "impact": 10,
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 3,
+              "other": 1,
+              "total": 6
+            },
+            "label": "%0"
+          },
+          {
+            "cost": 20,
+            "id": "b1",
+            "impact": 2000,
+            "instructions": {
+              "arith": 3,
+              "branch": 1,
+              "memory": 2,
+              "other": 3,
+              "total": 9
+            },
+            "label": "vector.body"
+          },
+          {
+            "cost": 26,
+            "id": "b2",
+            "impact": 26,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 12,
+              "other": 0,
+              "total": 13
+            },
+            "label": ".preheader"
+          },
+          {
+            "cost": 3,
+            "id": "b3",
+            "impact": 3,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 2
+            },
+            "label": "%20"
+          },
+          {
+            "cost": 137,
+            "id": "b4",
+            "impact": 2740,
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 13,
+              "other": 4,
+              "total": 19
+            },
+            "label": "%21"
+          },
+          {
+            "cost": 3,
+            "id": "b5",
+            "impact": 60,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 2
+            },
+            "label": "%23"
+          },
+          {
+            "cost": 4,
+            "id": "b6",
+            "impact": 80,
+            "instructions": {
+              "arith": 2,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 3
+            },
+            "label": "%24"
+          },
+          {
+            "cost": 3,
+            "id": "b7",
+            "impact": 3,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 2
+            },
+            "label": "%26"
+          }
+        ]
+      },
+      "instruction_count": 56,
+      "loops": [
+        {
+          "blocks": [
+            "%21",
+            "%23",
+            "%24"
+          ],
+          "critical_path": [
+            "%21",
+            "%23",
+            "%24"
+          ],
+          "dependencies": [
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%1",
+              "to_var": "%1",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%2",
+              "to_var": "%2",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%8",
+              "to_var": "%8",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%9",
+              "to_var": "%9",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%10",
+              "to_var": "%10",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%11",
+              "to_var": "%11",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%3",
+              "to_var": "%3",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%3",
+              "to_var": "%13",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%3",
+              "to_var": "%14",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%3",
+              "to_var": "%15",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%3",
+              "to_var": "%16",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%3",
+              "to_var": "%18",
+              "type": "output"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%12",
+              "to_var": "%12",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%12",
+              "to_var": "%13",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%12",
+              "to_var": "%14",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%12",
+              "to_var": "%15",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%12",
+              "to_var": "%16",
+              "type": "output"
+            },
+            {
+              "description": "Write-after-write (output) dependence",
+              "distance": 0,
+              "from_var": "%12",
+              "to_var": "%18",
+              "type": "output"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%13",
+              "to_var": "%13",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%14",
+              "to_var": "%14",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%15",
+              "to_var": "%15",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%16",
+              "to_var": "%16",
+              "type": "loop-carried"
+            },
+            {
+              "description": "Loop-carried dependence (distance 0)",
+              "distance": 0,
+              "from_var": "%18",
+              "to_var": "%18",
+              "type": "loop-carried"
+            }
+          ],
+          "depth": 1,
+          "header": "%21",
+          "id": "main::%21::0",
+          "induction_variable": ".01722",
+          "memory_accesses": [
+            {
+              "array": "%1",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%2",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%1",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%2",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%1",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%2",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            },
+            {
+              "array": "%3",
+              "pattern": "unknown",
+              "type": "store"
+            }
+          ],
+          "trip_count": "20"
+        },
+        {
+          "blocks": [
+            "vector.body"
+          ],
+          "critical_path": [
+            "vector.body"
+          ],
+          "dependencies": [],
+          "depth": 1,
+          "header": "vector.body",
+          "id": "main::vector.body::1",
+          "induction_variable": "index",
+          "memory_accesses": [
+            {
+              "array": "%4",
+              "pattern": "strided",
+              "type": "store"
+            }
+          ],
+          "trip_count": "262144"
+        }
+      ],
+      "name": "main"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "llvm.lifetime.start.p0"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "malloc"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "llvm.lifetime.end.p0"
+    },
+    {
+      "cfg": {
+        "edges": [
+          {
+            "from": "b0",
+            "to": "b3"
+          },
+          {
+            "from": "b0",
+            "to": "b1"
+          },
+          {
+            "from": "b1",
+            "to": "b2"
+          },
+          {
+            "from": "b2",
+            "to": "b3"
+          },
+          {
+            "from": "b2",
+            "to": "b2"
+          }
+        ],
+        "nodes": [
+          {
+            "cost": 97,
+            "id": "b0",
+            "impact": 97,
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 12,
+              "other": 6,
+              "total": 20
+            },
+            "label": "%4"
+          },
+          {
+            "cost": 3,
+            "id": "b1",
+            "impact": 3,
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 2
+            },
+            "label": ".lr.ph"
+          },
+          {
+            "cost": 39,
+            "id": "b2",
+            "impact": 3900,
+            "instructions": {
+              "arith": 2,
+              "branch": 1,
+              "memory": 3,
+              "other": 5,
+              "total": 11
+            },
+            "label": "%13"
+          },
+          {
+            "cost": 7,
+            "id": "b3",
+            "impact": 7,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 5,
+              "total": 6
+            },
+            "label": "._crit_edge"
+          }
+        ]
+      },
+      "instruction_count": 39,
+      "loops": [
+        {
+          "blocks": [
+            "%13"
+          ],
+          "critical_path": [
+            "%13"
+          ],
+          "dependencies": [],
+          "depth": 1,
+          "header": "%13",
+          "id": "__omp_offloading_811_507524_main_l15.omp_outlined::%13::0",
+          "induction_variable": "",
+          "memory_accesses": [],
+          "trip_count": "unknown"
+        }
+      ],
+      "name": "__omp_offloading_811_507524_main_l15.omp_outlined"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "__kmpc_for_static_init_4"
+    },
+    {
+      "cfg": {
+        "edges": [
+          {
+            "from": "b0",
+            "to": "b7"
+          },
+          {
+            "from": "b0",
+            "to": "b1"
+          },
+          {
+            "from": "b1",
+            "to": "b5"
+          },
+          {
+            "from": "b1",
+            "to": "b2"
+          },
+          {
+            "from": "b2",
+            "to": "b3"
+          },
+          {
+            "from": "b3",
+            "to": "b4"
+          },
+          {
+            "from": "b3",
+            "to": "b3"
+          },
+          {
+            "from": "b4",
+            "to": "b7"
+          },
+          {
+            "from": "b4",
+            "to": "b5"
+          },
+          {
+            "from": "b5",
+            "to": "b6"
+          },
+          {
+            "from": "b6",
+            "to": "b7"
+          },
+          {
+            "from": "b6",
+            "to": "b6"
+          }
+        ],
+        "nodes": [
+          {
+            "cost": 99,
+            "id": "b0",
+            "impact": 99,
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 12,
+              "other": 8,
+              "total": 22
+            },
+            "label": "%6"
+          },
+          {
+            "cost": 8,
+            "id": "b1",
+            "impact": 8,
+            "instructions": {
+              "arith": 4,
+              "branch": 1,
+              "memory": 0,
+              "other": 2,
+              "total": 7
+            },
+            "label": ".lr.ph.preheader"
+          },
+          {
+            "cost": 6,
+            "id": "b2",
+            "impact": 6,
+            "instructions": {
+              "arith": 2,
+              "branch": 1,
+              "memory": 1,
+              "other": 0,
+              "total": 4
+            },
+            "label": "vector.ph"
+          },
+          {
+            "cost": 28,
+            "id": "b3",
+            "impact": 2800,
+            "instructions": {
+              "arith": 3,
+              "branch": 1,
+              "memory": 3,
+              "other": 1,
+              "total": 8
+            },
+            "label": "vector.body"
+          },
+          {
+            "cost": 3,
+            "id": "b4",
+            "impact": 3,
+            "instructions": {
+              "arith": 1,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 2
+            },
+            "label": "middle.block"
+          },
+          {
+            "cost": 3,
+            "id": "b5",
+            "impact": 3,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 1,
+              "total": 2
+            },
+            "label": ".lr.ph.preheader14"
+          },
+          {
+            "cost": 29,
+            "id": "b6",
+            "impact": 2900,
+            "instructions": {
+              "arith": 3,
+              "branch": 1,
+              "memory": 3,
+              "other": 2,
+              "total": 9
+            },
+            "label": ".lr.ph"
+          },
+          {
+            "cost": 7,
+            "id": "b7",
+            "impact": 7,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 5,
+              "total": 6
+            },
+            "label": "._crit_edge"
+          }
+        ]
+      },
+      "instruction_count": 60,
+      "loops": [
+        {
+          "blocks": [
+            ".lr.ph"
+          ],
+          "critical_path": [
+            ".lr.ph"
+          ],
+          "dependencies": [],
+          "depth": 1,
+          "header": ".lr.ph",
+          "id": "__omp_offloading_811_507524_main_l15.omp_outlined.omp_outlined::.lr.ph::0",
+          "induction_variable": "",
+          "memory_accesses": [],
+          "trip_count": "unknown"
+        },
+        {
+          "blocks": [
+            "vector.body"
+          ],
+          "critical_path": [
+            "vector.body"
+          ],
+          "dependencies": [],
+          "depth": 1,
+          "header": "vector.body",
+          "id": "__omp_offloading_811_507524_main_l15.omp_outlined.omp_outlined::vector.body::1",
+          "induction_variable": "",
+          "memory_accesses": [],
+          "trip_count": "unknown"
+        }
+      ],
+      "name": "__omp_offloading_811_507524_main_l15.omp_outlined.omp_outlined"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "__kmpc_for_static_fini"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "__kmpc_fork_call"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "__kmpc_fork_teams"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "__tgt_target_kernel"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "free"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "llvm.smin.i32"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": []
+      },
+      "instruction_count": 0,
+      "loops": [],
+      "name": "llvm.memset.p0.i64"
+    }
+  ]
+}

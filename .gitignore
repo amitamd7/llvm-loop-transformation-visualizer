@@ -1,5 +1,7 @@
 ll-dump
 *.o
+__pycache__/
+*.pyc
 *.dot
 output.json
 web/output.json
@@ -7,3 +9,7 @@ web/before.json
 web/after.json
 web/perf.json
 web/perf_compare.json
+web/before.ll
+web/after.ll
+web/remarks.yaml
+web/remarks.json

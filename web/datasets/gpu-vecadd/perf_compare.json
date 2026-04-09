@@ -1,0 +1,27 @@
+{
+  "profiler": "rocprof",
+  "device": "gfx90a (MI210)",
+  "runs": 5,
+  "before": {
+    "execution_time": 4.82,
+    "valu_insts": 524288,
+    "salu_insts": 32768,
+    "vmem_insts": 262144,
+    "smem_insts": 4096,
+    "lds_insts": 0,
+    "waves": 512,
+    "l2_hit_rate": 0.62,
+    "instructions": 823296
+  },
+  "after": {
+    "execution_time": 1.37,
+    "valu_insts": 131072,
+    "salu_insts": 40960,
+    "vmem_insts": 65536,
+    "smem_insts": 8192,
+    "lds_insts": 16384,
+    "waves": 2048,
+    "l2_hit_rate": 0.91,
+    "instructions": 262144
+  }
+}

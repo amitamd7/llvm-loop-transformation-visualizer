@@ -1,0 +1,73 @@
+{
+  "functions": [
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": [
+          {
+            "cost": 2,
+            "id": "b0",
+            "impact": 2,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "%1"
+          }
+        ]
+      },
+      "instruction_count": 1,
+      "loops": [],
+      "name": "body"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": [
+          {
+            "cost": 2,
+            "id": "b0",
+            "impact": 2,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "%1"
+          }
+        ]
+      },
+      "instruction_count": 1,
+      "loops": [],
+      "name": "split_demo"
+    },
+    {
+      "cfg": {
+        "edges": [],
+        "nodes": [
+          {
+            "cost": 2,
+            "id": "b0",
+            "impact": 2,
+            "instructions": {
+              "arith": 0,
+              "branch": 1,
+              "memory": 0,
+              "other": 0,
+              "total": 1
+            },
+            "label": "%0"
+          }
+        ]
+      },
+      "instruction_count": 1,
+      "loops": [],
+      "name": "main"
+    }
+  ]
+}

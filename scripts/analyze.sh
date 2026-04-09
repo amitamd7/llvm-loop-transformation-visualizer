@@ -85,10 +85,25 @@ if command -v opt &>/dev/null && [ -n "${OPT_PASS:-}" ]; then
   fi
 fi
 
+# --- Find a free port (portable, uses python3) ---
+find_free_port() {
+  local p="$1" max=$(( $1 + 20 ))
+  while [ "$p" -le "$max" ]; do
+    if ! python3 -c "import socket; s=socket.socket(); s.settimeout(0.1); s.connect(('127.0.0.1',$p))" 2>/dev/null; then
+      echo "$p"; return
+    fi
+    p=$(( p + 1 ))
+  done
+  echo "$1"
+}
+
+PORT=$(find_free_port "$PORT")
+
 echo ""
 echo "======================================"
 echo "  Visualization ready!"
 echo "  Open: http://localhost:$PORT/"
+echo "  Dataset: 'Latest analysis' (first dropdown entry)"
 echo "======================================"
 echo ""
 
