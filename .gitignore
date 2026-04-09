@@ -13,3 +13,6 @@ web/before.ll
 web/after.ll
 web/remarks.yaml
 web/remarks.json
+tests/generated_sources/
+tests/results/
+tests/report.txt
